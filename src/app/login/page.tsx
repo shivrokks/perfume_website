@@ -19,6 +19,24 @@ const formSchema = z.object({
   password: z.string().min(1, { message: "Password is required." }),
 });
 
+// Helper function to generate a user-friendly error description
+const getAuthErrorDescription = (error: any) => {
+    if (!error.code) return error.message || "An unexpected error occurred.";
+    switch (error.code) {
+        case 'auth/invalid-api-key':
+            return "Your Firebase configuration is invalid. Please check your environment variables.";
+        case 'auth/user-not-found':
+        case 'auth/wrong-password':
+        case 'auth/invalid-credential':
+             return "Invalid email or password. Please try again.";
+        case 'auth/popup-closed-by-user':
+            return "The sign-in popup was closed before completing. Please try again.";
+        default:
+            return error.message;
+    }
+}
+
+
 export default function LoginPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [isGoogleLoading, setIsGoogleLoading] = useState(false);
@@ -44,7 +62,7 @@ export default function LoginPage() {
       toast({
         variant: "destructive",
         title: "Login Failed",
-        description: error.message || "An unexpected error occurred.",
+        description: getAuthErrorDescription(error),
       });
     } finally {
       setIsLoading(false);
@@ -61,7 +79,7 @@ export default function LoginPage() {
        toast({
         variant: "destructive",
         title: "Google Sign-In Failed",
-        description: error.message || "Could not sign in with Google.",
+        description: getAuthErrorDescription(error),
       });
     } finally {
       setIsGoogleLoading(false);
