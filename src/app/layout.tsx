@@ -7,7 +7,6 @@ import { Footer } from '@/components/footer';
 import { Toaster } from '@/components/ui/toaster';
 import { CartProvider } from '@/context/cart-provider';
 import { AuthProvider } from '@/context/auth-provider';
-import Chatbot from '@/components/chatbot';
 
 export const metadata: Metadata = {
   title: 'LORVÉ',
@@ -36,7 +35,6 @@ export default function RootLayout({
                 <Footer />
               </div>
               <Toaster />
-              <Chatbot />
             </CartProvider>
           </AuthProvider>
         </ThemeProvider>
