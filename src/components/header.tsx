@@ -102,7 +102,6 @@ export function Header() {
         </div>
 
         <div className="flex flex-1 items-center justify-end space-x-2">
-          <ThemeToggle />
           <Sheet>
             <SheetTrigger asChild>
               <Button variant="ghost" size="icon" className="relative">
@@ -184,6 +183,7 @@ export function Header() {
             </Button>
           )}
 
+          <ThemeToggle />
         </div>
       </div>
     </header>
