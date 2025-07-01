@@ -36,6 +36,8 @@ const getAuthErrorDescription = (error: any) => {
             return "The verification link is invalid or has expired. Please try signing up again.";
         case 'auth/expired-action-code':
             return "The verification link has expired. Please try signing up again.";
+        case 'auth/quota-exceeded':
+            return "The daily limit for sending sign-up emails has been reached. Please try again tomorrow.";
         default:
             return error.message;
     }
