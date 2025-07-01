@@ -15,8 +15,6 @@ const fromFirestore = (doc): Perfume => {
     notes: data.notes,
     description: data.description,
     ingredients: data.ingredients,
-    featured: data.featured,
-    newArrival: data.newArrival,
   };
 };
 
@@ -45,29 +43,5 @@ export const getProductById = async (id: string): Promise<Perfume | null> => {
   } catch (error) {
     console.error("Error fetching product by ID:", error);
     return null;
-  }
-};
-
-export const getFeaturedProducts = async (): Promise<Perfume[]> => {
-   try {
-    const productsCollection = collection(firestore, 'products');
-    const q = query(productsCollection, where('featured', '==', true), limit(6));
-    const productSnapshot = await getDocs(q);
-    return productSnapshot.docs.map(fromFirestore);
-  } catch (error) {
-    console.error("Error fetching featured products:", error);
-    return [];
-  }
-};
-
-export const getNewArrivals = async (): Promise<Perfume[]> => {
-  try {
-    const productsCollection = collection(firestore, 'products');
-    const q = query(productsCollection, where('newArrival', '==', true), limit(4));
-    const productSnapshot = await getDocs(q);
-    return productSnapshot.docs.map(fromFirestore);
-  } catch (error) {
-    console.error("Error fetching new arrivals:", error);
-    return [];
   }
 };

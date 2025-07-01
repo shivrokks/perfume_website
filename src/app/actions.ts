@@ -15,8 +15,6 @@ const ProductSchema = z.object({
   description: z.string().min(1, "Description is required"),
   ingredients: z.string().min(1, "Ingredients are required"),
   image: z.string().url("Must be a valid placeholder URL").optional(),
-  featured: z.boolean().optional(),
-  newArrival: z.boolean().optional(),
 });
 
 export async function addProduct(formData: FormData) {
@@ -25,8 +23,6 @@ export async function addProduct(formData: FormData) {
   const parsed = ProductSchema.safeParse({
     ...values,
     price: Number(values.price),
-    featured: values.featured === 'on',
-    newArrival: values.newArrival === 'on',
   });
 
   if (!parsed.success) {
@@ -66,8 +62,6 @@ export async function updateProduct(id: string, formData: FormData) {
   const parsed = ProductSchema.safeParse({
     ...values,
     price: Number(values.price),
-    featured: values.featured === 'on',
-    newArrival: values.newArrival === 'on',
   });
 
   if (!parsed.success) {

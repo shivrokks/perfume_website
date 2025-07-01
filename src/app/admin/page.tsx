@@ -15,7 +15,6 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Checkbox } from '@/components/ui/checkbox';
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { useToast } from '@/hooks/use-toast';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -31,8 +30,6 @@ const ProductSchema = z.object({
   description: z.string().min(1, "Description is required"),
   ingredients: z.string().min(1, "Provide comma-separated ingredients"),
   image: z.string().url("Must be a valid placeholder URL").optional().or(z.literal('')),
-  featured: z.boolean().optional(),
-  newArrival: z.boolean().optional(),
 });
 
 const defaultFormValues = {
@@ -44,8 +41,6 @@ const defaultFormValues = {
   description: '',
   ingredients: '',
   image: 'https://placehold.co/600x600.png',
-  featured: false,
-  newArrival: false,
 };
 
 export default function AdminPage() {
@@ -274,38 +269,6 @@ export default function AdminPage() {
                   </FormItem>
                 )}
               />
-              <div className="flex items-center space-x-8">
-                <FormField
-                  control={form.control}
-                  name="featured"
-                  render={({ field }) => (
-                    <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
-                      <FormControl>
-                        <Checkbox checked={field.value} onCheckedChange={field.onChange} />
-                      </FormControl>
-                      <div className="space-y-1 leading-none">
-                        <FormLabel>Featured Product</FormLabel>
-                        <FormDescription>Display this product on the homepage featured carousel.</FormDescription>
-                      </div>
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="newArrival"
-                  render={({ field }) => (
-                    <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
-                      <FormControl>
-                        <Checkbox checked={field.value} onCheckedChange={field.onChange} />
-                      </FormControl>
-                      <div className="space-y-1 leading-none">
-                        <FormLabel>New Arrival</FormLabel>
-                        <FormDescription>Display this product in the new arrivals section.</FormDescription>
-                      </div>
-                    </FormItem>
-                  )}
-                />
-              </div>
               <div className="flex items-center gap-4">
                 <Button type="submit" disabled={isSubmitting}>
                   {isSubmitting ? (
