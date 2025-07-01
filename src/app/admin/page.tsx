@@ -39,7 +39,7 @@ const defaultFormValues = {
   name: '',
   brand: 'LORVÉ',
   price: 100,
-  gender: 'Unisex',
+  gender: 'Unisex' as const,
   notes: '',
   description: '',
   ingredients: '',
@@ -154,27 +154,168 @@ export default function AdminPage() {
         <CardContent>
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
-              {/* Form fields remain the same */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                <FormField control={form.control} name="name" render={({ field }) => ( <FormItem> <FormLabel>Perfume Name</FormLabel> <FormControl> <Input placeholder="Elysian Bloom" {...field} /> </FormControl> <FormMessage /> </FormItem> )}/>
-                <FormField control={form.control} name="brand" render={({ field }) => ( <FormItem> <FormLabel>Brand</FormLabel> <FormControl> <Input placeholder="LORVÉ" {...field} /> </FormControl> <FormMessage /> </FormItem> )}/>
+                <FormField
+                  control={form.control}
+                  name="name"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Perfume Name</FormLabel>
+                      <FormControl>
+                        <Input placeholder="Elysian Bloom" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="brand"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Brand</FormLabel>
+                      <FormControl>
+                        <Input placeholder="LORVÉ" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                <FormField control={form.control} name="price" render={({ field }) => ( <FormItem> <FormLabel>Price</FormLabel> <FormControl> <Input type="number" placeholder="180" {...field} /> </FormControl> <FormMessage /> </FormItem> )}/>
-                <FormField control={form.control} name="gender" render={({ field }) => ( <FormItem> <FormLabel>Gender</FormLabel> <Select onValueChange={field.onChange} value={field.value} defaultValue={field.value}> <FormControl> <SelectTrigger> <SelectValue placeholder="Select a gender" /> </SelectTrigger> </FormControl> <SelectContent> <SelectItem value="Men">Men</SelectItem> <SelectItem value="Women">Women</SelectItem> <SelectItem value="Unisex">Unisex</SelectItem> </SelectContent> </Select> <FormMessage /> </FormItem> )}/>
+                <FormField
+                  control={form.control}
+                  name="price"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Price</FormLabel>
+                      <FormControl>
+                        <Input type="number" placeholder="180" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="gender"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Gender</FormLabel>
+                      <Select onValueChange={field.onChange} value={field.value}>
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select a gender" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          <SelectItem value="Men">Men</SelectItem>
+                          <SelectItem value="Women">Women</SelectItem>
+                          <SelectItem value="Unisex">Unisex</SelectItem>
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
               </div>
-              <FormField control={form.control} name="description" render={({ field }) => ( <FormItem> <FormLabel>Description</FormLabel> <FormControl> <Textarea placeholder="A captivating floral fragrance..." {...field} /> </FormControl> <FormMessage /> </FormItem> )}/>
-              <FormField control={form.control} name="notes" render={({ field }) => ( <FormItem> <FormLabel>Fragrance Notes</FormLabel> <FormControl> <Input placeholder="Jasmine, Tuberose, Sandalwood" {...field} /> </FormControl> <FormDescription>Comma-separated values.</FormDescription> <FormMessage /> </FormItem> )}/>
-              <FormField control={form.control} name="ingredients" render={({ field }) => ( <FormItem> <FormLabel>Ingredients</FormLabel> <FormControl> <Input placeholder="Alcohol Denat., Parfum, Aqua" {...field} /> </FormControl> <FormDescription>Comma-separated values.</FormDescription> <FormMessage /> </FormItem> )}/>
-              <FormField control={form.control} name="image" render={({ field }) => ( <FormItem> <FormLabel>Image URL</FormLabel> <FormControl> <Input placeholder="https://placehold.co/600x600.png" {...field} /> </FormControl> <FormDescription>Leave empty to use default placeholder.</FormDescription> <FormMessage /> </FormItem> )}/>
+              <FormField
+                control={form.control}
+                name="description"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Description</FormLabel>
+                    <FormControl>
+                      <Textarea placeholder="A captivating floral fragrance..." {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="notes"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Fragrance Notes</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Jasmine, Tuberose, Sandalwood" {...field} />
+                    </FormControl>
+                    <FormDescription>Comma-separated values.</FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="ingredients"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Ingredients</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Alcohol Denat., Parfum, Aqua" {...field} />
+                    </FormControl>
+                    <FormDescription>Comma-separated values.</FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="image"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Image URL</FormLabel>
+                    <FormControl>
+                      <Input placeholder="https://placehold.co/600x600.png" {...field} />
+                    </FormControl>
+                    <FormDescription>Leave empty to use default placeholder.</FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
               <div className="flex items-center space-x-8">
-                <FormField control={form.control} name="featured" render={({ field }) => ( <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4"> <FormControl> <Checkbox checked={field.value} onCheckedChange={field.onChange} /> </FormControl> <div className="space-y-1 leading-none"> <FormLabel>Featured Product</FormLabel> <FormDescription> Display this product on the homepage featured carousel. </FormDescription> </div> </FormItem> )}/>
-                <FormField control={form.control} name="newArrival" render={({ field }) => ( <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4"> <FormControl> <Checkbox checked={field.value} onCheckedChange={field.onChange} /> </FormControl> <div className="space-y-1 leading-none"> <FormLabel>New Arrival</FormLabel> <FormDescription> Display this product in the new arrivals section. </FormDescription> </div> </FormItem> )}/>
+                <FormField
+                  control={form.control}
+                  name="featured"
+                  render={({ field }) => (
+                    <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
+                      <FormControl>
+                        <Checkbox checked={field.value} onCheckedChange={field.onChange} />
+                      </FormControl>
+                      <div className="space-y-1 leading-none">
+                        <FormLabel>Featured Product</FormLabel>
+                        <FormDescription>Display this product on the homepage featured carousel.</FormDescription>
+                      </div>
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="newArrival"
+                  render={({ field }) => (
+                    <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
+                      <FormControl>
+                        <Checkbox checked={field.value} onCheckedChange={field.onChange} />
+                      </FormControl>
+                      <div className="space-y-1 leading-none">
+                        <FormLabel>New Arrival</FormLabel>
+                        <FormDescription>Display this product in the new arrivals section.</FormDescription>
+                      </div>
+                    </FormItem>
+                  )}
+                />
               </div>
-              
               <div className="flex items-center gap-4">
                 <Button type="submit" disabled={isSubmitting}>
-                  {isSubmitting ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> {editingProduct ? 'Updating...' : 'Adding...'}</> : (editingProduct ? 'Update Product' : 'Add Product')}
+                  {isSubmitting ? (
+                    <>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      {editingProduct ? 'Updating...' : 'Adding...'}
+                    </>
+                  ) : (
+                    editingProduct ? 'Update Product' : 'Add Product'
+                  )}
                 </Button>
                 {editingProduct && (
                   <Button type="button" variant="outline" onClick={handleCancelEdit}>
