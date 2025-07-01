@@ -21,11 +21,11 @@ export default async function Home() {
       <section className="relative h-[60vh] min-h-[400px] w-full bg-gradient-to-r from-primary/80 to-accent/20 text-primary-foreground">
         <Image 
           src="https://placehold.co/1800x1200.png" 
-          alt="Luxury perfume bottle" 
+          alt="Elegant perfume display" 
           layout="fill" 
           objectFit="cover" 
-          className="z-0 opacity-20"
-          data-ai-hint="perfume bottle"
+          className="z-0 opacity-30"
+          data-ai-hint="elegant perfume"
         />
         <div className="container mx-auto flex h-full flex-col items-center justify-center text-center relative z-10">
           <h1 className="font-headline text-4xl font-bold md:text-6xl lg:text-7xl">

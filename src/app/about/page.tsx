@@ -26,10 +26,10 @@ export default function AboutPage() {
             <div className="relative h-96 w-full rounded-lg overflow-hidden shadow-xl">
                <Image
                 src="https://placehold.co/800x600.png"
-                alt="Perfumery workshop"
+                alt="Artisan perfumery workshop"
                 layout="fill"
                 objectFit="cover"
-                data-ai-hint="perfume workshop"
+                data-ai-hint="artisan perfumery"
               />
             </div>
           </div>
@@ -40,10 +40,10 @@ export default function AboutPage() {
              <div className="relative h-96 w-full rounded-lg overflow-hidden shadow-xl md:order-2">
                <Image
                 src="https://placehold.co/800x600.png"
-                alt="Rare perfume ingredients"
+                alt="Rare botanical perfume ingredients"
                 layout="fill"
                 objectFit="cover"
-                data-ai-hint="perfume ingredients"
+                data-ai-hint="rare botanicals"
               />
             </div>
             <div className="md:order-1">
