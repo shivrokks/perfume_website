@@ -11,6 +11,7 @@ import { useSearchParams } from 'next/navigation';
 import { Filter } from 'lucide-react';
 import { Sheet, SheetContent, SheetTrigger, SheetHeader, SheetTitle, SheetFooter } from './ui/sheet';
 import { motion } from 'framer-motion';
+import { Input } from './ui/input';
 
 interface ProductGridProps {
   allProducts: Perfume[];
@@ -68,35 +69,69 @@ export default function ProductGrid({ allProducts }: ProductGridProps) {
     },
   };
 
-  const FilterPanel = () => (
-    <div className="space-y-8">
-        <div>
-            <h3 className="font-headline text-lg mb-4">Gender</h3>
-            <div className="flex flex-col gap-2">
-                {['All', 'Men', 'Women', 'Unisex'].map(g => (
-                    <Button key={g} variant={genderFilter === g ? 'default' : 'ghost'} onClick={() => setGenderFilter(g)} className="justify-start">
-                        {g}
-                    </Button>
-                ))}
+  const FilterPanel = () => {
+    const handleMinPriceChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const newMin = Number(e.target.value);
+        if (!isNaN(newMin) && newMin >= 0 && newMin <= priceRange[1]) {
+            setPriceRange([newMin, priceRange[1]]);
+        }
+    };
+
+    const handleMaxPriceChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const newMax = Number(e.target.value);
+        if (!isNaN(newMax) && newMax <= 300 && newMax >= priceRange[0]) {
+            setPriceRange([priceRange[0], newMax]);
+        }
+    };
+
+    return (
+        <div className="space-y-8">
+            <div>
+                <h3 className="font-headline text-lg mb-4">Gender</h3>
+                <div className="flex flex-col gap-2">
+                    {['All', 'Men', 'Women', 'Unisex'].map(g => (
+                        <Button key={g} variant={genderFilter === g ? 'default' : 'ghost'} onClick={() => setGenderFilter(g)} className="justify-start">
+                            {g}
+                        </Button>
+                    ))}
+                </div>
+            </div>
+            <div>
+                <h3 className="font-headline text-lg mb-4">Price Range</h3>
+                <div className="flex items-center gap-2 mb-4">
+                    <div className="relative">
+                        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground">$</span>
+                        <Input
+                            type="number"
+                            value={priceRange[0]}
+                            onChange={handleMinPriceChange}
+                            className="pl-6"
+                            aria-label="Minimum price"
+                        />
+                    </div>
+                    <span className="text-muted-foreground">-</span>
+                    <div className="relative">
+                        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground">$</span>
+                        <Input
+                            type="number"
+                            value={priceRange[1]}
+                            onChange={handleMaxPriceChange}
+                            className="pl-6"
+                            aria-label="Maximum price"
+                        />
+                    </div>
+                </div>
+                <Slider
+                    value={priceRange}
+                    onValueChange={setPriceRange}
+                    max={300}
+                    min={0}
+                    step={5}
+                />
             </div>
         </div>
-        <div>
-            <h3 className="font-headline text-lg mb-4">Price Range</h3>
-            <Slider
-                defaultValue={[0, 300]}
-                min={0}
-                max={300}
-                step={5}
-                value={priceRange}
-                onValueChange={setPriceRange}
-            />
-            <div className="flex justify-between text-sm text-muted-foreground mt-2">
-                <span>${priceRange[0]}</span>
-                <span>${priceRange[1]}</span>
-            </div>
-        </div>
-    </div>
-  );
+    );
+  };
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
