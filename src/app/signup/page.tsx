@@ -50,6 +50,10 @@ export default function SignupPage() {
 
   const form = useForm({
     resolver: zodResolver(currentSchema),
+    defaultValues: {
+      email: "",
+      password: "",
+    },
   });
 
   useEffect(() => {

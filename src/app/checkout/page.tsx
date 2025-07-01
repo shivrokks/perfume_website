@@ -66,7 +66,16 @@ export default function CheckoutPage() {
         setIsAddressLoading(true);
         const savedAddress = await getUserAddress(user.uid);
         if (savedAddress) {
-          form.reset(savedAddress);
+          form.reset({
+            fullName: savedAddress.fullName || '',
+            addressLine1: savedAddress.addressLine1 || '',
+            addressLine2: savedAddress.addressLine2 || '',
+            city: savedAddress.city || '',
+            state: savedAddress.state || '',
+            postalCode: savedAddress.postalCode || '',
+            country: savedAddress.country || 'United States',
+            phone: savedAddress.phone || '',
+          });
         }
         setIsAddressLoading(false);
       }
