@@ -1,20 +1,11 @@
 import Link from 'next/link';
 import Image from 'next/image';
-import {
-  Carousel,
-  CarouselContent,
-  CarouselItem,
-  CarouselNext,
-  CarouselPrevious,
-} from '@/components/ui/carousel';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
-import { getFeaturedProducts, getNewArrivals } from '@/lib/products';
+import { getProducts } from '@/lib/products';
 import PerfumeCard from '@/components/perfume-card';
 
 export default async function Home() {
-  const featuredProducts = await getFeaturedProducts();
-  const newArrivals = await getNewArrivals();
+  const allProducts = await getProducts();
 
   return (
     <div className="flex flex-col">
@@ -35,72 +26,27 @@ export default async function Home() {
             Discover a world of exquisite fragrances, crafted for the modern connoisseur.
           </p>
           <Button asChild size="lg" className="mt-8 bg-accent text-accent-foreground hover:bg-accent/90">
-            <Link href="/products">Shop Now</Link>
+            <Link href="/products">Explore The Collection</Link>
           </Button>
         </div>
       </section>
 
-      <section className="py-16 sm:py-24">
+      <section className="bg-background py-16 sm:py-24">
         <div className="container mx-auto">
-          <h2 className="mb-12 text-center font-headline text-3xl font-bold md:text-4xl">
-            Featured Collection
-          </h2>
-           {featuredProducts.length > 0 ? (
-            <Carousel
-              opts={{
-                align: 'start',
-                loop: true,
-              }}
-              className="w-full"
-            >
-              <CarouselContent>
-                {featuredProducts.map((product) => (
-                  <CarouselItem key={product.id} className="md:basis-1/2 lg:basis-1/3">
-                    <div className="p-1">
-                      <Card className="overflow-hidden">
-                        <CardContent className="flex aspect-square items-center justify-center p-0 relative">
-                          <Link href={`/products/${product.id}`} className="absolute inset-0">
-                            <Image
-                              src={product.image}
-                              alt={product.name}
-                              fill
-                              className="object-cover transition-transform duration-300 hover:scale-105"
-                              data-ai-hint="perfume bottle"
-                            />
-                            <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
-                          </Link>
-                          <div className="absolute bottom-0 w-full p-4 text-white">
-                              <h3 className="font-headline text-xl font-bold">{product.name}</h3>
-                              <p className="text-sm">{product.brand}</p>
-                          </div>
-                        </CardContent>
-                      </Card>
-                    </div>
-                  </CarouselItem>
-                ))}
-              </CarouselContent>
-              <CarouselPrevious className="hidden sm:flex" />
-              <CarouselNext className="hidden sm:flex" />
-            </Carousel>
-          ) : (
-            <p className="text-center text-muted-foreground">Featured products will appear here.</p>
-          )}
-        </div>
-      </section>
-      
-      <section className="bg-secondary py-16 sm:py-24">
-        <div className="container mx-auto">
-          <h2 className="mb-12 text-center font-headline text-3xl font-bold md:text-4xl">
-            New Arrivals
-          </h2>
-          {newArrivals.length > 0 ? (
+          <div className="text-center mb-12">
+            <h2 className="font-headline text-3xl font-bold md:text-4xl">
+              Our Collection
+            </h2>
+             <p className="text-muted-foreground mt-2 text-lg">Explore our curated selection of fine fragrances.</p>
+          </div>
+          {allProducts.length > 0 ? (
             <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
-              {newArrivals.map((product) => (
+              {allProducts.map((product) => (
                 <PerfumeCard key={product.id} perfume={product} />
               ))}
             </div>
            ) : (
-             <p className="text-center text-muted-foreground">New arrivals will appear here.</p>
+             <p className="text-center text-muted-foreground">Our collection will appear here soon.</p>
            )}
         </div>
       </section>
