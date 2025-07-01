@@ -19,7 +19,7 @@ interface AuthContextType {
 
 export const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-const adminEmail = process.env.NEXT_PUBLIC_ADMIN_EMAIL;
+const adminEmail = "shivansh121shukla@gmail.com";
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
@@ -45,6 +45,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       url: `${window.location.origin}/signup`,
       handleCodeInApp: true,
     };
+    console.log('Firebase Auth: The domain that needs to be authorized is based on this URL:', window.location.origin);
     window.localStorage.setItem('emailForSignIn', email);
     return sendSignInLinkToEmail(auth, email, actionCodeSettings);
   };
