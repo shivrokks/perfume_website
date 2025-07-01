@@ -18,7 +18,7 @@ interface AuthContextType {
 
 export const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-const adminUid = process.env.NEXT_PUBLIC_ADMIN_UID;
+const adminEmail = process.env.NEXT_PUBLIC_ADMIN_EMAIL;
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
@@ -28,7 +28,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       setUser(user);
-      setIsAdmin(user ? user.uid === adminUid : false);
+      setIsAdmin(user ? user.email === adminEmail : false);
       setLoading(false);
     });
 
