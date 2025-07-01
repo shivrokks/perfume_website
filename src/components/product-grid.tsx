@@ -4,11 +4,8 @@ import { useState, useMemo } from 'react';
 import type { Perfume } from '@/lib/types';
 import PerfumeCard from './perfume-card';
 import { Button } from './ui/button';
-import { Input } from './ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
 import { Slider } from './ui/slider';
-import { Label } from './ui/label';
-import { Checkbox } from './ui/checkbox';
 import { useSearchParams } from 'next/navigation';
 import { Filter } from 'lucide-react';
 import { Sheet, SheetContent, SheetTrigger, SheetHeader, SheetTitle, SheetFooter } from './ui/sheet';
@@ -18,15 +15,6 @@ interface ProductGridProps {
   allProducts: Perfume[];
 }
 
-const allNotes = [
-    'Jasmine', 'Tuberose', 'Sandalwood', 'Black Pepper', 'Leather', 
-    'Oud', 'Bergamot', 'Neroli', 'Amber', 'Rose', 'Praline', 
-    'Sea Salt', 'Sage', 'Ambrette', 'Incense', 'Myrrh', 'Vetiver',
-    'Lemon', 'Mandarin', 'Basil', 'Cedarwood', 'Tobacco', 'Vanilla'
-];
-const uniqueNotes = Array.from(new Set(allNotes)).sort();
-
-
 export default function ProductGrid({ allProducts }: ProductGridProps) {
   const searchParams = useSearchParams();
 
@@ -34,7 +22,6 @@ export default function ProductGrid({ allProducts }: ProductGridProps) {
   const [genderFilter, setGenderFilter] = useState(searchParams.get('gender') || 'All');
   const [priceRange, setPriceRange] = useState([0, 300]);
   const [displayPriceRange, setDisplayPriceRange] = useState([0, 300]);
-  const [selectedNotes, setSelectedNotes] = useState<string[]>([]);
   const [isFiltersOpen, setIsFiltersOpen] = useState(false);
 
   const filteredAndSortedProducts = useMemo(() => {
@@ -48,12 +35,6 @@ export default function ProductGrid({ allProducts }: ProductGridProps) {
     // Filter by price
     products = products.filter(p => p.price >= priceRange[0] && p.price <= priceRange[1]);
     
-    // Filter by notes
-    if (selectedNotes.length > 0) {
-      products = products.filter(p => selectedNotes.every(note => p.notes.includes(note)));
-    }
-
-
     // Sort
     switch (sortOrder) {
       case 'price-asc':
@@ -75,13 +56,7 @@ export default function ProductGrid({ allProducts }: ProductGridProps) {
     }
 
     return products;
-  }, [allProducts, genderFilter, priceRange, selectedNotes, sortOrder]);
-
-  const handleNoteChange = (note: string) => {
-    setSelectedNotes(prev => 
-      prev.includes(note) ? prev.filter(n => n !== note) : [...prev, note]
-    );
-  };
+  }, [allProducts, genderFilter, priceRange, sortOrder]);
   
   const containerVariants = {
     hidden: { opacity: 1 },
@@ -119,17 +94,6 @@ export default function ProductGrid({ allProducts }: ProductGridProps) {
             <div className="flex justify-between text-sm text-muted-foreground mt-2">
                 <span>${displayPriceRange[0]}</span>
                 <span>${displayPriceRange[1]}</span>
-            </div>
-        </div>
-        <div>
-            <h3 className="font-headline text-lg mb-4">Fragrance Notes</h3>
-            <div className="space-y-2 max-h-60 overflow-y-auto pr-2">
-                {uniqueNotes.map(note => (
-                    <div key={note} className="flex items-center gap-2">
-                        <Checkbox id={note} onCheckedChange={() => handleNoteChange(note)} checked={selectedNotes.includes(note)} />
-                        <Label htmlFor={note} className="font-normal">{note}</Label>
-                    </div>
-                ))}
             </div>
         </div>
     </div>
@@ -195,7 +159,7 @@ export default function ProductGrid({ allProducts }: ProductGridProps) {
         
         {filteredAndSortedProducts.length > 0 ? (
           <motion.div 
-            key={genderFilter + priceRange.join('-') + selectedNotes.join('-') + sortOrder}
+            key={genderFilter + priceRange.join('-') + sortOrder}
             className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6"
             variants={containerVariants}
             initial="hidden"
