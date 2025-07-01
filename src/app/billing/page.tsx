@@ -1,20 +1,44 @@
 // @ts-nocheck
 "use client";
 
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { useAuth } from '@/hooks/use-auth';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { CheckCircle, CreditCard, Loader2 } from 'lucide-react';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Loader2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { z } from 'zod';
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
+import { Input } from '@/components/ui/input';
+import { AddressSchema, upsertUserAddress, getUserAddress } from '@/app/actions';
+import type { Address } from '@/lib/types';
+
 
 export default function BillingPage() {
   const { user, loading } = useAuth();
   const router = useRouter();
   const { toast } = useToast();
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isAddressLoading, setIsAddressLoading] = useState(true);
 
-  React.useEffect(() => {
+  const form = useForm<z.infer<typeof AddressSchema>>({
+    resolver: zodResolver(AddressSchema),
+    defaultValues: {
+      fullName: '',
+      addressLine1: '',
+      addressLine2: '',
+      city: '',
+      state: '',
+      postalCode: '',
+      country: 'United States',
+      phone: '',
+    },
+  });
+
+  useEffect(() => {
     if (!loading && !user) {
       toast({
         variant: 'destructive',
@@ -24,6 +48,36 @@ export default function BillingPage() {
       router.push('/login');
     }
   }, [user, loading, router, toast]);
+
+  useEffect(() => {
+    async function fetchAddress() {
+      if (user) {
+        setIsAddressLoading(true);
+        const savedAddress = await getUserAddress(user.uid);
+        if (savedAddress) {
+          form.reset(savedAddress);
+        }
+        setIsAddressLoading(false);
+      }
+    }
+    fetchAddress();
+  }, [user, form]);
+
+
+  async function onSubmit(values: z.infer<typeof AddressSchema>) {
+    if (!user) {
+      toast({ variant: 'destructive', title: 'Error', description: 'You must be logged in.' });
+      return;
+    }
+    setIsSubmitting(true);
+    const result = await upsertUserAddress(user.uid, values);
+    if (result.success) {
+      toast({ title: 'Success', description: 'Your address has been saved.' });
+    } else {
+      toast({ variant: 'destructive', title: 'Error', description: result.error });
+    }
+    setIsSubmitting(false);
+  }
 
   if (loading || !user) {
     return (
@@ -36,90 +90,129 @@ export default function BillingPage() {
   return (
     <div className="container mx-auto py-12 max-w-4xl">
       <div className="mb-12">
-        <h1 className="font-headline text-4xl md:text-5xl font-bold">Billing</h1>
-        <p className="text-muted-foreground mt-2 text-lg">Manage your subscription and payment details.</p>
+        <h1 className="font-headline text-4xl md:text-5xl font-bold">Account</h1>
+        <p className="text-muted-foreground mt-2 text-lg">Manage your shipping details.</p>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-start">
-        <Card>
-          <CardHeader>
-            <CardTitle>Current Plan</CardTitle>
-            <CardDescription>You are currently on the free plan.</CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
-             <div className="text-4xl font-bold">$0<span className="text-lg font-normal text-muted-foreground">/month</span></div>
-             <ul className="space-y-2 text-muted-foreground">
-                <li className="flex items-center">
-                    <CheckCircle className="h-4 w-4 mr-2 text-green-500" />
-                    Unlimited product browsing
-                </li>
-                <li className="flex items-center">
-                    <CheckCircle className="h-4 w-4 mr-2 text-green-500" />
-                    Save items to cart
-                </li>
-                 <li className="flex items-center">
-                    <CheckCircle className="h-4 w-4 mr-2 text-green-500" />
-                    Standard checkout
-                </li>
-             </ul>
-          </CardContent>
-          <CardFooter>
-            <Button disabled>Your Current Plan</Button>
-          </CardFooter>
-        </Card>
+      <Card>
+        <CardHeader>
+          <CardTitle>Shipping Address</CardTitle>
+          <CardDescription>This is the address we'll use for your deliveries.</CardDescription>
+        </CardHeader>
+        <CardContent>
+          {isAddressLoading ? (
+             <div className="flex justify-center items-center h-40">
+                <Loader2 className="h-8 w-8 animate-spin" />
+             </div>
+          ) : (
+          <Form {...form}>
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <FormField
+                  control={form.control}
+                  name="fullName"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Full Name</FormLabel>
+                      <FormControl><Input placeholder="John Doe" {...field} /></FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="phone"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Phone Number</FormLabel>
+                      <FormControl><Input placeholder="(123) 456-7890" {...field} /></FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
 
-        <Card className="bg-primary text-primary-foreground">
-          <CardHeader>
-            <CardTitle>LORVÉ Premium</CardTitle>
-            <CardDescription className="text-primary-foreground/80">Upgrade for exclusive benefits.</CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
-             <div className="text-4xl font-bold">$10<span className="text-lg font-normal text-primary-foreground/80">/month</span></div>
-             <ul className="space-y-2 text-primary-foreground/80">
-                <li className="flex items-center">
-                    <CheckCircle className="h-4 w-4 mr-2 text-accent" />
-                    Everything in Free, plus:
-                </li>
-                <li className="flex items-center">
-                    <CheckCircle className="h-4 w-4 mr-2 text-accent" />
-                    Early access to new arrivals
-                </li>
-                 <li className="flex items-center">
-                    <CheckCircle className="h-4 w-4 mr-2 text-accent" />
-                    Exclusive member discounts
-                </li>
-                 <li className="flex items-center">
-                    <CheckCircle className="h-4 w-4 mr-2 text-accent" />
-                    Free shipping on all orders
-                </li>
-             </ul>
-          </CardContent>
-          <CardFooter>
-            <Button variant="secondary" className="w-full">Upgrade to Premium</Button>
-          </CardFooter>
-        </Card>
-      </div>
-      
-      <div className="mt-12">
-        <Card>
-            <CardHeader>
-                <CardTitle>Payment Method</CardTitle>
-                <CardDescription>This is a placeholder for a payment gateway like Stripe.</CardDescription>
-            </CardHeader>
-            <CardContent>
-                <div className="flex items-center justify-between p-4 border rounded-lg bg-secondary">
-                    <div className="flex items-center gap-4">
-                        <CreditCard className="h-8 w-8 text-muted-foreground"/>
-                        <div>
-                            <p className="font-semibold">Visa ending in 1234</p>
-                            <p className="text-sm text-muted-foreground">Expires 08/2026</p>
-                        </div>
-                    </div>
-                    <Button variant="outline">Update</Button>
-                </div>
-            </CardContent>
-        </Card>
-      </div>
+               <FormField
+                  control={form.control}
+                  name="addressLine1"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Address Line 1</FormLabel>
+                      <FormControl><Input placeholder="123 Perfume Lane" {...field} /></FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                 <FormField
+                  control={form.control}
+                  name="addressLine2"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Address Line 2 <span className='text-muted-foreground'>(Optional)</span></FormLabel>
+                      <FormControl><Input placeholder="Apt, suite, etc." {...field} /></FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                 <FormField
+                  control={form.control}
+                  name="city"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>City</FormLabel>
+                      <FormControl><Input placeholder="New York" {...field} /></FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                 <FormField
+                  control={form.control}
+                  name="state"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>State / Province</FormLabel>
+                      <FormControl><Input placeholder="NY" {...field} /></FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+
+               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                 <FormField
+                  control={form.control}
+                  name="postalCode"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Postal Code</FormLabel>
+                      <FormControl><Input placeholder="10001" {...field} /></FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                 <FormField
+                  control={form.control}
+                  name="country"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Country</FormLabel>
+                      <FormControl><Input placeholder="United States" {...field} /></FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+              <Button type="submit" disabled={isSubmitting}>
+                {isSubmitting ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
+                Save Address
+              </Button>
+            </form>
+          </Form>
+          )}
+        </CardContent>
+      </Card>
     </div>
   );
 }

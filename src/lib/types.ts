@@ -15,3 +15,14 @@ export interface Perfume {
 export interface CartItem extends Perfume {
   quantity: number;
 }
+
+export interface Address {
+  fullName: string;
+  addressLine1: string;
+  addressLine2?: string;
+  city: string;
+  state: string;
+  postalCode: string;
+  country: string;
+  phone: string;
+}

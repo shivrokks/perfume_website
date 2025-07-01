@@ -2,8 +2,9 @@
 
 import { z } from "zod";
 import { firestore } from "@/lib/firebase";
-import { collection, addDoc, serverTimestamp } from "firebase/firestore";
+import { collection, addDoc, serverTimestamp, doc, getDoc, setDoc } from "firebase/firestore";
 import { revalidatePath } from "next/cache";
+import type { Address } from "@/lib/types";
 
 const ProductSchema = z.object({
   name: z.string().min(1, "Name is required"),
@@ -16,6 +17,17 @@ const ProductSchema = z.object({
   image: z.string().url("Must be a valid placeholder URL").optional(),
   featured: z.boolean().optional(),
   newArrival: z.boolean().optional(),
+});
+
+export const AddressSchema = z.object({
+  fullName: z.string().min(3, "Full name is required"),
+  addressLine1: z.string().min(5, "Address is required"),
+  addressLine2: z.string().optional(),
+  city: z.string().min(2, "City is required"),
+  state: z.string().min(2, "State/Province is required"),
+  postalCode: z.string().min(4, "Postal code is required"),
+  country: z.string().min(2, "Country is required"),
+  phone: z.string().min(10, "A valid phone number is required"),
 });
 
 export async function addProduct(formData: FormData) {
@@ -55,6 +67,42 @@ export async function addProduct(formData: FormData) {
     return {
       success: false,
       error: { _global: ["Failed to add product to the database."] },
+    };
+  }
+}
+
+export async function getUserAddress(userId: string): Promise<Address | null> {
+  if (!userId) return null;
+  try {
+    const userDocRef = doc(firestore, 'users', userId);
+    const userDoc = await getDoc(userDocRef);
+    if (userDoc.exists() && userDoc.data()?.address) {
+      return userDoc.data()?.address as Address;
+    }
+    return null;
+  } catch (error) {
+    console.error("Error fetching user address:", error);
+    return null;
+  }
+}
+
+export async function upsertUserAddress(userId: string, address: Address) {
+  if (!userId) {
+    throw new Error("User ID is required to save an address.");
+  }
+  try {
+    const userDocRef = doc(firestore, 'users', userId);
+    await setDoc(userDocRef, { address }, { merge: true });
+    
+    revalidatePath('/checkout');
+    revalidatePath('/billing');
+
+    return { success: true };
+  } catch (error) {
+    console.error("Error saving address:", error);
+    return {
+      success: false,
+      error: "Failed to save address."
     };
   }
 }

@@ -22,16 +22,14 @@ const navLinks = [
 ];
 
 export function Header() {
-  const { cartItems, removeFromCart, updateQuantity, cartCount, totalPrice, clearCart } = useCart();
+  const { cartItems, removeFromCart, updateQuantity, cartCount, totalPrice } = useCart();
   const { user, loading } = useAuth();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const pathname = usePathname();
   const router = useRouter();
 
   const handleCheckout = () => {
-    // In a real app, this would redirect to a payment gateway.
-    clearCart();
-    router.push('/checkout/success');
+    router.push('/checkout');
   }
 
   return (
