@@ -11,7 +11,6 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { getFeaturedProducts, getNewArrivals } from '@/lib/products';
 import PerfumeCard from '@/components/perfume-card';
-import PersonalizedFinder from '@/components/personalized-finder';
 
 export default function Home() {
   const featuredProducts = getFeaturedProducts();
@@ -97,8 +96,6 @@ export default function Home() {
           </div>
         </div>
       </section>
-
-      <PersonalizedFinder />
 
     </div>
   );
