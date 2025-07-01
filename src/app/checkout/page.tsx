@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useEffect, useState } from 'react';
-import Link from 'next/link';
 import { useAuth } from '@/hooks/use-auth';
 import { useCart } from '@/hooks/use-cart';
 import { useRouter } from 'next/navigation';
@@ -17,7 +16,8 @@ import { Input } from '@/components/ui/input';
 import { Separator } from '@/components/ui/separator';
 import { Loader2, ArrowLeft } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
-import { AddressSchema, upsertUserAddress, getUserAddress } from '@/app/actions';
+import { upsertUserAddress, getUserAddress } from '@/app/actions';
+import { AddressSchema } from '@/lib/schemas';
 
 export default function CheckoutPage() {
   const { user, loading: authLoading } = useAuth();
