@@ -86,7 +86,7 @@ export default function ProductGrid({ allProducts }: ProductGridProps) {
                 defaultValue={[0, 300]}
                 min={0}
                 max={300}
-                step={10}
+                step={5}
                 value={displayPriceRange}
                 onValueChange={setDisplayPriceRange}
                 onValueCommit={setPriceRange}

@@ -2,7 +2,7 @@
 
 import { z } from "zod";
 import { firestore } from "@/lib/firebase";
-import { collection, addDoc, serverTimestamp, doc, getDoc, setDoc } from "firebase/firestore";
+import { collection, addDoc, serverTimestamp, doc, getDoc, setDoc, updateDoc } from "firebase/firestore";
 import { revalidatePath } from "next/cache";
 import type { Address } from "@/lib/types";
 
@@ -59,6 +59,50 @@ export async function addProduct(formData: FormData) {
     };
   }
 }
+
+export async function updateProduct(id: string, formData: FormData) {
+  const values = Object.fromEntries(formData.entries());
+
+  const parsed = ProductSchema.safeParse({
+    ...values,
+    price: Number(values.price),
+    featured: values.featured === 'on',
+    newArrival: values.newArrival === 'on',
+  });
+
+  if (!parsed.success) {
+    return {
+      success: false,
+      error: parsed.error.flatten().fieldErrors,
+    };
+  }
+  
+  const productData = parsed.data;
+
+  try {
+    const productRef = doc(firestore, "products", id);
+    await updateDoc(productRef, {
+      ...productData,
+      notes: productData.notes.split(',').map(note => note.trim()),
+      ingredients: productData.ingredients.split(',').map(ing => ing.trim()),
+      image: productData.image || "https://placehold.co/600x600.png",
+      updatedAt: serverTimestamp(),
+    });
+
+    revalidatePath(`/products/${id}`);
+    revalidatePath('/products');
+    revalidatePath('/admin');
+    
+    return { success: true };
+  } catch (error) {
+    console.error("Error updating document: ", error);
+    return {
+      success: false,
+      error: { _global: ["Failed to update product in the database."] },
+    };
+  }
+}
+
 
 export async function getUserAddress(userId: string): Promise<Address | null> {
   if (!userId) return null;

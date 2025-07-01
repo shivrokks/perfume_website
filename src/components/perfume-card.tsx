@@ -4,8 +4,10 @@ import Link from 'next/link';
 import Image from 'next/image';
 import type { Perfume } from '@/lib/types';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import AddToCartButton from './add-to-cart-button';
+import { Button } from '@/components/ui/button';
+import { useCart } from '@/hooks/use-cart';
 import { motion } from 'framer-motion';
+import { Plus, Minus } from 'lucide-react';
 
 interface PerfumeCardProps {
   perfume: Perfume;
@@ -20,6 +22,9 @@ const cardVariants = {
 };
 
 export default function PerfumeCard({ perfume }: PerfumeCardProps) {
+  const { cartItems, addToCart, updateQuantity } = useCart();
+  const itemInCart = cartItems.find((item) => item.id === perfume.id);
+
   return (
     <motion.div variants={cardVariants} className="h-full">
       <Card className="flex h-full flex-col overflow-hidden transition-shadow duration-300 hover:shadow-lg">
@@ -49,7 +54,31 @@ export default function PerfumeCard({ perfume }: PerfumeCardProps) {
           <p className="mt-2 font-semibold">${perfume.price.toFixed(2)}</p>
         </CardContent>
         <CardFooter className="p-4 pt-0">
-          <AddToCartButton perfume={perfume} />
+          {itemInCart ? (
+            <div className="flex w-full items-center justify-center gap-2">
+              <Button
+                variant="outline"
+                size="icon"
+                className="h-8 w-8"
+                onClick={() => updateQuantity(itemInCart.id, itemInCart.quantity - 1)}
+              >
+                <Minus className="h-4 w-4" />
+              </Button>
+              <span className="min-w-[2rem] text-center font-bold">{itemInCart.quantity}</span>
+              <Button
+                variant="outline"
+                size="icon"
+                className="h-8 w-8"
+                onClick={() => updateQuantity(itemInCart.id, itemInCart.quantity + 1)}
+              >
+                <Plus className="h-4 w-4" />
+              </Button>
+            </div>
+          ) : (
+            <Button onClick={() => addToCart(perfume)} className="w-full">
+              Add to Cart
+            </Button>
+          )}
         </CardFooter>
       </Card>
     </motion.div>
