@@ -7,11 +7,11 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useAuth } from '@/hooks/use-auth';
 import { useRouter } from 'next/navigation';
-import { addProduct, updateProduct } from '@/app/actions';
+import { addProduct, updateProduct, deleteProduct } from '@/app/actions';
 import { getProducts } from '@/lib/products';
 import type { Perfume } from '@/lib/types';
 
-import { Button } from '@/components/ui/button';
+import { Button, buttonVariants } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -19,6 +19,7 @@ import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, For
 import { useToast } from '@/hooks/use-toast';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
 import { Loader2 } from 'lucide-react';
 
 const ProductSchema = z.object({
@@ -51,6 +52,8 @@ export default function AdminPage() {
   const [products, setProducts] = useState<Perfume[]>([]);
   const [isFetchingProducts, setIsFetchingProducts] = useState(true);
   const [editingProduct, setEditingProduct] = useState<Perfume | null>(null);
+  const [productToDelete, setProductToDelete] = useState<Perfume | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   const form = useForm<z.infer<typeof ProductSchema>>({
     resolver: zodResolver(ProductSchema),
@@ -97,6 +100,30 @@ export default function AdminPage() {
     setEditingProduct(null);
     form.reset(defaultFormValues);
   };
+  
+  const handleDelete = async () => {
+    if (!productToDelete) return;
+
+    setIsDeleting(true);
+    const result = await deleteProduct(productToDelete.id);
+
+    if (result.success) {
+      toast({
+        title: 'Product Deleted',
+        description: `${productToDelete.name} has been successfully deleted.`,
+      });
+      fetchProducts(); // Refresh the list
+    } else {
+      toast({
+        variant: 'destructive',
+        title: 'Error',
+        description: result.error || 'Failed to delete product.',
+      });
+    }
+    
+    setIsDeleting(false);
+    setProductToDelete(null); // Close the dialog
+  };
 
   async function onSubmit(values: z.infer<typeof ProductSchema>) {
     const formData = new FormData();
@@ -141,6 +168,7 @@ export default function AdminPage() {
   }
 
   return (
+    <>
     <div className="container mx-auto py-12 space-y-12">
       <Card className="max-w-4xl mx-auto">
         <CardHeader>
@@ -318,9 +346,12 @@ export default function AdminPage() {
                     <TableCell>{product.brand}</TableCell>
                     <TableCell>${product.price.toFixed(2)}</TableCell>
                     <TableCell>{product.gender}</TableCell>
-                    <TableCell className="text-right">
+                    <TableCell className="text-right space-x-2">
                       <Button variant="outline" size="sm" onClick={() => handleEditClick(product)}>
                         Edit
+                      </Button>
+                      <Button variant="destructive" size="sm" onClick={() => setProductToDelete(product)}>
+                        Delete
                       </Button>
                     </TableCell>
                   </TableRow>
@@ -331,5 +362,28 @@ export default function AdminPage() {
         </CardContent>
       </Card>
     </div>
+    <AlertDialog open={!!productToDelete} onOpenChange={(isOpen) => !isOpen && setProductToDelete(null)}>
+      <AlertDialogContent>
+        <AlertDialogHeader>
+          <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+          <AlertDialogDescription>
+            This action cannot be undone. This will permanently delete the product
+            <span className="font-bold"> {productToDelete?.name}</span>.
+          </AlertDialogDescription>
+        </AlertDialogHeader>
+        <AlertDialogFooter>
+          <AlertDialogCancel onClick={() => setProductToDelete(null)} disabled={isDeleting}>Cancel</AlertDialogCancel>
+          <AlertDialogAction 
+            onClick={handleDelete} 
+            disabled={isDeleting} 
+            className={buttonVariants({ variant: "destructive" })}
+          >
+            {isDeleting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+            Delete
+          </AlertDialogAction>
+        </AlertDialogFooter>
+      </AlertDialogContent>
+    </AlertDialog>
+    </>
   );
 }

@@ -2,7 +2,7 @@
 
 import { z } from "zod";
 import { firestore } from "@/lib/firebase";
-import { collection, addDoc, serverTimestamp, doc, getDoc, setDoc, updateDoc } from "firebase/firestore";
+import { collection, addDoc, serverTimestamp, doc, getDoc, setDoc, updateDoc, deleteDoc } from "firebase/firestore";
 import { revalidatePath } from "next/cache";
 import type { Address } from "@/lib/types";
 
@@ -93,6 +93,25 @@ export async function updateProduct(id: string, formData: FormData) {
     return {
       success: false,
       error: { _global: ["Failed to update product in the database."] },
+    };
+  }
+}
+
+export async function deleteProduct(id: string) {
+  if (!id) {
+    return { success: false, error: "Product ID is required." };
+  }
+
+  try {
+    await deleteDoc(doc(firestore, "products", id));
+    revalidatePath('/products');
+    revalidatePath('/admin');
+    return { success: true };
+  } catch (error) {
+    console.error("Error deleting document: ", error);
+    return {
+      success: false,
+      error: "Failed to delete product from the database.",
     };
   }
 }
