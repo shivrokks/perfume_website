@@ -1,0 +1,197 @@
+"use client";
+
+import { useState, useMemo } from 'react';
+import type { Perfume } from '@/lib/types';
+import PerfumeCard from './perfume-card';
+import { Button } from './ui/button';
+import { Input } from './ui/input';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
+import { Slider } from './ui/slider';
+import { Label } from './ui/label';
+import { Checkbox } from './ui/checkbox';
+import { useSearchParams } from 'next/navigation';
+import { Filter } from 'lucide-react';
+import { Sheet, SheetContent, SheetTrigger, SheetHeader, SheetTitle, SheetFooter } from './ui/sheet';
+
+interface ProductGridProps {
+  allProducts: Perfume[];
+}
+
+const allNotes = [
+    'Jasmine', 'Tuberose', 'Sandalwood', 'Black Pepper', 'Leather', 
+    'Oud', 'Bergamot', 'Neroli', 'Amber', 'Rose', 'Praline', 
+    'Sea Salt', 'Sage', 'Ambrette', 'Incense', 'Myrrh', 'Vetiver',
+    'Lemon', 'Mandarin', 'Basil', 'Cedarwood', 'Tobacco', 'Vanilla'
+];
+const uniqueNotes = Array.from(new Set(allNotes)).sort();
+
+
+export default function ProductGrid({ allProducts }: ProductGridProps) {
+  const searchParams = useSearchParams();
+
+  const [sortOrder, setSortOrder] = useState('featured');
+  const [genderFilter, setGenderFilter] = useState(searchParams.get('gender') || 'All');
+  const [priceRange, setPriceRange] = useState([0, 300]);
+  const [selectedNotes, setSelectedNotes] = useState<string[]>([]);
+  const [isFiltersOpen, setIsFiltersOpen] = useState(false);
+
+  const filteredAndSortedProducts = useMemo(() => {
+    let products = [...allProducts];
+
+    // Filter by gender
+    if (genderFilter !== 'All') {
+      products = products.filter(p => p.gender === genderFilter);
+    }
+
+    // Filter by price
+    products = products.filter(p => p.price >= priceRange[0] && p.price <= priceRange[1]);
+    
+    // Filter by notes
+    if (selectedNotes.length > 0) {
+      products = products.filter(p => selectedNotes.every(note => p.notes.includes(note)));
+    }
+
+
+    // Sort
+    switch (sortOrder) {
+      case 'price-asc':
+        products.sort((a, b) => a.price - b.price);
+        break;
+      case 'price-desc':
+        products.sort((a, b) => b.price - a.price);
+        break;
+      case 'name-asc':
+        products.sort((a, b) => a.name.localeCompare(b.name));
+        break;
+      case 'name-desc':
+        products.sort((a, b) => b.name.localeCompare(a.name));
+        break;
+      case 'featured':
+      default:
+        // Optional: could add a more sophisticated featured sort
+        break;
+    }
+
+    return products;
+  }, [allProducts, genderFilter, priceRange, selectedNotes, sortOrder]);
+
+  const handleNoteChange = (note: string) => {
+    setSelectedNotes(prev => 
+      prev.includes(note) ? prev.filter(n => n !== note) : [...prev, note]
+    );
+  };
+
+  const FilterPanel = () => (
+    <div className="space-y-8">
+        <div>
+            <h3 className="font-headline text-lg mb-4">Gender</h3>
+            <div className="flex flex-col gap-2">
+                {['All', 'Men', 'Women', 'Unisex'].map(g => (
+                    <Button key={g} variant={genderFilter === g ? 'default' : 'ghost'} onClick={() => setGenderFilter(g)} className="justify-start">
+                        {g}
+                    </Button>
+                ))}
+            </div>
+        </div>
+        <div>
+            <h3 className="font-headline text-lg mb-4">Price Range</h3>
+            <Slider
+                defaultValue={[0, 300]}
+                min={0}
+                max={300}
+                step={10}
+                onValueChange={setPriceRange}
+            />
+            <div className="flex justify-between text-sm text-muted-foreground mt-2">
+                <span>${priceRange[0]}</span>
+                <span>${priceRange[1]}</span>
+            </div>
+        </div>
+        <div>
+            <h3 className="font-headline text-lg mb-4">Fragrance Notes</h3>
+            <div className="space-y-2 max-h-60 overflow-y-auto pr-2">
+                {uniqueNotes.map(note => (
+                    <div key={note} className="flex items-center gap-2">
+                        <Checkbox id={note} onCheckedChange={() => handleNoteChange(note)} checked={selectedNotes.includes(note)} />
+                        <Label htmlFor={note} className="font-normal">{note}</Label>
+                    </div>
+                ))}
+            </div>
+        </div>
+    </div>
+  );
+
+  return (
+    <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
+      {/* Desktop Filters */}
+      <aside className="hidden lg:block lg:col-span-1">
+        <FilterPanel />
+      </aside>
+
+      {/* Mobile Filters */}
+       <div className="lg:hidden col-span-full flex justify-between items-center mb-4">
+        <Sheet open={isFiltersOpen} onOpenChange={setIsFiltersOpen}>
+            <SheetTrigger asChild>
+                <Button variant="outline">
+                    <Filter className="mr-2 h-4 w-4" />
+                    Filters
+                </Button>
+            </SheetTrigger>
+            <SheetContent side="left" className="w-full max-w-sm">
+                <SheetHeader>
+                    <SheetTitle>Filters</SheetTitle>
+                </SheetHeader>
+                <div className="py-4 overflow-y-auto">
+                    <FilterPanel />
+                </div>
+                <SheetFooter>
+                    <Button onClick={() => setIsFiltersOpen(false)} className="w-full">Apply Filters</Button>
+                </SheetFooter>
+            </SheetContent>
+        </Sheet>
+         <Select onValueChange={setSortOrder} defaultValue="featured">
+          <SelectTrigger className="w-[180px]">
+            <SelectValue placeholder="Sort by" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="featured">Featured</SelectItem>
+            <SelectItem value="price-asc">Price: Low to High</SelectItem>
+            <SelectItem value="price-desc">Price: High to Low</SelectItem>
+            <SelectItem value="name-asc">Name: A-Z</SelectItem>
+            <SelectItem value="name-desc">Name: Z-A</SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
+
+      <main className="col-span-full lg:col-span-3">
+        <div className="hidden lg:flex justify-end mb-4">
+           <Select onValueChange={setSortOrder} defaultValue="featured">
+            <SelectTrigger className="w-[180px]">
+              <SelectValue placeholder="Sort by" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="featured">Featured</SelectItem>
+              <SelectItem value="price-asc">Price: Low to High</SelectItem>
+              <SelectItem value="price-desc">Price: High to Low</SelectItem>
+              <SelectItem value="name-asc">Name: A-Z</SelectItem>
+              <SelectItem value="name-desc">Name: Z-A</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+        
+        {filteredAndSortedProducts.length > 0 ? (
+          <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6">
+            {filteredAndSortedProducts.map(product => (
+              <PerfumeCard key={product.id} perfume={product} />
+            ))}
+          </div>
+        ) : (
+          <div className="text-center py-16">
+              <h2 className="font-headline text-2xl">No Products Found</h2>
+              <p className="text-muted-foreground mt-2">Try adjusting your filters to find what you're looking for.</p>
+          </div>
+        )}
+      </main>
+    </div>
+  );
+}
