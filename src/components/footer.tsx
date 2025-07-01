@@ -1,13 +1,11 @@
 import Link from 'next/link';
 import { Diamond, Instagram, Twitter, Facebook } from 'lucide-react';
-import { Button } from './ui/button';
-import { Input } from './ui/input';
 
 export function Footer() {
   return (
     <footer className="bg-secondary text-secondary-foreground">
       <div className="container mx-auto py-12 px-4 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-1 gap-8 md:grid-cols-4">
+        <div className="grid grid-cols-1 gap-8 md:grid-cols-3">
           <div className="md:col-span-1">
             <Link href="/" className="flex items-center space-x-2">
               <Diamond className="h-8 w-8 text-primary" />
@@ -33,14 +31,6 @@ export function Footer() {
               <li><Link href="/contact" className="hover:text-primary transition-colors">Contact</Link></li>
               <li><Link href="#" className="hover:text-primary transition-colors">FAQs</Link></li>
             </ul>
-          </div>
-          <div>
-             <h3 className="font-headline text-sm font-semibold tracking-wider uppercase">Newsletter</h3>
-             <p className="mt-4 text-sm">Subscribe for exclusive offers and new arrivals.</p>
-             <form className="mt-4 flex gap-2">
-                <Input type="email" placeholder="Your email" className="bg-background" />
-                <Button type="submit" className="bg-primary text-primary-foreground">Subscribe</Button>
-             </form>
           </div>
         </div>
         <div className="mt-12 border-t pt-8 flex flex-col sm:flex-row justify-between items-center">
