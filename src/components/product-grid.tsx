@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState, useMemo } from 'react';
@@ -21,7 +22,6 @@ export default function ProductGrid({ allProducts }: ProductGridProps) {
   const [sortOrder, setSortOrder] = useState('featured');
   const [genderFilter, setGenderFilter] = useState(searchParams.get('gender') || 'All');
   const [priceRange, setPriceRange] = useState([0, 300]);
-  const [displayPriceRange, setDisplayPriceRange] = useState([0, 300]);
   const [isFiltersOpen, setIsFiltersOpen] = useState(false);
 
   const filteredAndSortedProducts = useMemo(() => {
@@ -87,13 +87,12 @@ export default function ProductGrid({ allProducts }: ProductGridProps) {
                 min={0}
                 max={300}
                 step={5}
-                value={displayPriceRange}
-                onValueChange={setDisplayPriceRange}
-                onValueCommit={setPriceRange}
+                value={priceRange}
+                onValueChange={setPriceRange}
             />
             <div className="flex justify-between text-sm text-muted-foreground mt-2">
-                <span>${displayPriceRange[0]}</span>
-                <span>${displayPriceRange[1]}</span>
+                <span>${priceRange[0]}</span>
+                <span>${priceRange[1]}</span>
             </div>
         </div>
     </div>
@@ -123,7 +122,7 @@ export default function ProductGrid({ allProducts }: ProductGridProps) {
                     <FilterPanel />
                 </div>
                 <SheetFooter>
-                    <Button onClick={() => setIsFiltersOpen(false)} className="w-full">Apply Filters</Button>
+                    <Button onClick={() => setIsFiltersOpen(false)} className="w-full">Done</Button>
                 </SheetFooter>
             </SheetContent>
         </Sheet>
