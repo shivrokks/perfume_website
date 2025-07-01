@@ -12,9 +12,9 @@ import { Card, CardContent } from '@/components/ui/card';
 import { getFeaturedProducts, getNewArrivals } from '@/lib/products';
 import PerfumeCard from '@/components/perfume-card';
 
-export default function Home() {
-  const featuredProducts = getFeaturedProducts();
-  const newArrivals = getNewArrivals();
+export default async function Home() {
+  const featuredProducts = await getFeaturedProducts();
+  const newArrivals = await getNewArrivals();
 
   return (
     <div className="flex flex-col">
@@ -45,42 +45,46 @@ export default function Home() {
           <h2 className="mb-12 text-center font-headline text-3xl font-bold md:text-4xl">
             Featured Collection
           </h2>
-          <Carousel
-            opts={{
-              align: 'start',
-              loop: true,
-            }}
-            className="w-full"
-          >
-            <CarouselContent>
-              {featuredProducts.map((product) => (
-                <CarouselItem key={product.id} className="md:basis-1/2 lg:basis-1/3">
-                  <div className="p-1">
-                    <Card className="overflow-hidden">
-                      <CardContent className="flex aspect-square items-center justify-center p-0 relative">
-                        <Link href={`/products/${product.id}`} className="absolute inset-0">
-                          <Image
-                            src={product.image}
-                            alt={product.name}
-                            fill
-                            className="object-cover transition-transform duration-300 hover:scale-105"
-                            data-ai-hint="perfume bottle"
-                          />
-                           <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
-                        </Link>
-                        <div className="absolute bottom-0 w-full p-4 text-white">
-                            <h3 className="font-headline text-xl font-bold">{product.name}</h3>
-                            <p className="text-sm">{product.brand}</p>
-                        </div>
-                      </CardContent>
-                    </Card>
-                  </div>
-                </CarouselItem>
-              ))}
-            </CarouselContent>
-            <CarouselPrevious className="hidden sm:flex" />
-            <CarouselNext className="hidden sm:flex" />
-          </Carousel>
+           {featuredProducts.length > 0 ? (
+            <Carousel
+              opts={{
+                align: 'start',
+                loop: true,
+              }}
+              className="w-full"
+            >
+              <CarouselContent>
+                {featuredProducts.map((product) => (
+                  <CarouselItem key={product.id} className="md:basis-1/2 lg:basis-1/3">
+                    <div className="p-1">
+                      <Card className="overflow-hidden">
+                        <CardContent className="flex aspect-square items-center justify-center p-0 relative">
+                          <Link href={`/products/${product.id}`} className="absolute inset-0">
+                            <Image
+                              src={product.image}
+                              alt={product.name}
+                              fill
+                              className="object-cover transition-transform duration-300 hover:scale-105"
+                              data-ai-hint="perfume bottle"
+                            />
+                            <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+                          </Link>
+                          <div className="absolute bottom-0 w-full p-4 text-white">
+                              <h3 className="font-headline text-xl font-bold">{product.name}</h3>
+                              <p className="text-sm">{product.brand}</p>
+                          </div>
+                        </CardContent>
+                      </Card>
+                    </div>
+                  </CarouselItem>
+                ))}
+              </CarouselContent>
+              <CarouselPrevious className="hidden sm:flex" />
+              <CarouselNext className="hidden sm:flex" />
+            </Carousel>
+          ) : (
+            <p className="text-center text-muted-foreground">Featured products will appear here.</p>
+          )}
         </div>
       </section>
       
@@ -89,11 +93,15 @@ export default function Home() {
           <h2 className="mb-12 text-center font-headline text-3xl font-bold md:text-4xl">
             New Arrivals
           </h2>
-          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
-            {newArrivals.map((product) => (
-              <PerfumeCard key={product.id} perfume={product} />
-            ))}
-          </div>
+          {newArrivals.length > 0 ? (
+            <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
+              {newArrivals.map((product) => (
+                <PerfumeCard key={product.id} perfume={product} />
+              ))}
+            </div>
+           ) : (
+             <p className="text-center text-muted-foreground">New arrivals will appear here.</p>
+           )}
         </div>
       </section>
 

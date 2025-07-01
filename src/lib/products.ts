@@ -1,113 +1,73 @@
+import { firestore } from './firebase';
+import { collection, getDocs, doc, getDoc, query, where, orderBy, limit } from 'firebase/firestore';
 import type { Perfume } from './types';
 
-const perfumes: Perfume[] = [
-  {
-    id: '1',
-    name: 'Elysian Bloom',
-    brand: 'LORVÉ',
-    price: 180,
-    image: 'https://placehold.co/600x600.png',
-    gender: 'Women',
-    notes: ['Jasmine', 'Tuberose', 'Sandalwood'],
-    description: 'A captivating floral fragrance that evokes the scent of a blooming garden at dusk. Rich and romantic.',
-    ingredients: ['Alcohol Denat.', 'Parfum (Fragrance)', 'Aqua (Water)', 'Linalool', 'Limonene'],
-    featured: true,
-    newArrival: true,
-  },
-  {
-    id: '2',
-    name: 'Noir Enigma',
-    brand: 'LORVÉ',
-    price: 220,
-    image: 'https://placehold.co/600x600.png',
-    gender: 'Men',
-    notes: ['Black Pepper', 'Leather', 'Oud'],
-    description: 'A mysterious and intense scent for the modern man. Bold, sophisticated, and unforgettable.',
-    ingredients: ['Alcohol Denat.', 'Parfum (Fragrance)', 'Aqua (Water)', 'Coumarin', 'Citral'],
-    featured: true,
-  },
-  {
-    id: '3',
-    name: 'Golden Hour',
-    brand: 'LORVÉ',
-    price: 195,
-    image: 'https://placehold.co/600x600.png',
-    gender: 'Unisex',
-    notes: ['Bergamot', 'Neroli', 'Amber'],
-    description: 'A warm and radiant fragrance that captures the magic of sunset. Uplifting and comforting.',
-    ingredients: ['Alcohol Denat.', 'Parfum (Fragrance)', 'Aqua (Water)', 'Geraniol', 'Farnesol'],
-    featured: true,
-    newArrival: true,
-  },
-  {
-    id: '4',
-    name: 'Velvet Oud',
-    brand: 'LORVÉ',
-    price: 250,
-    image: 'https://placehold.co/600x600.png',
-    gender: 'Unisex',
-    notes: ['Rose', 'Oud', 'Praline'],
-    description: 'A luxurious and opulent blend of precious woods and delicate florals. Rich, deep, and sensual.',
-    ingredients: ['Alcohol Denat.', 'Parfum (Fragrance)', 'Aqua (Water)', 'Citronellol', 'Eugenol'],
-    featured: true,
-  },
-  {
-    id: '5',
-    name: 'Azure Mist',
-    brand: 'LORVÉ',
-    price: 160,
-    image: 'https://placehold.co/600x600.png',
-    gender: 'Women',
-    notes: ['Sea Salt', 'Sage', 'Ambrette'],
-    description: 'A fresh and invigorating scent that recalls a walk along the windswept shore. Crisp and clean.',
-    ingredients: ['Alcohol Denat.', 'Parfum (Fragrance)', 'Aqua (Water)', 'Linalool', 'Limonene'],
-    newArrival: true,
-  },
-  {
-    id: '6',
-    name: 'Obsidian Night',
-    brand: 'LORVÉ',
-    price: 210,
-    image: 'https://placehold.co/600x600.png',
-    gender: 'Men',
-    notes: ['Incense', 'Myrrh', 'Vetiver'],
-    description: 'A deep and smoky fragrance that is both powerful and contemplative. For moments of introspection.',
-    ingredients: ['Alcohol Denat.', 'Parfum (Fragrance)', 'Aqua (Water)', 'Benzyl Benzoate', 'Alpha-Isomethyl Ionone'],
-  },
-  {
-    id: '7',
-    name: 'Citrine Dream',
-    brand: 'LORVÉ',
-    price: 175,
-    image: 'https://placehold.co/600x600.png',
-    gender: 'Unisex',
-    notes: ['Lemon', 'Mandarin', 'Basil'],
-    description: 'A vibrant and zesty citrus burst that is instantly uplifting and energizing. Perfect for daytime.',
-    ingredients: ['Alcohol Denat.', 'Parfum (Fragrance)', 'Aqua (Water)', 'Limonene', 'Citral'],
-    newArrival: true,
-  },
-  {
-    id: '8',
-    name: 'Imperial Wood',
-    brand: 'LORVÉ',
-    price: 230,
-    image: 'https://placehold.co/600x600.png',
-    gender: 'Men',
-    notes: ['Cedarwood', 'Tobacco', 'Vanilla'],
-    description: 'A regal and commanding scent with a warm, woody heart. The essence of quiet confidence.',
-    ingredients: ['Alcohol Denat.', 'Parfum (Fragrance)', 'Aqua (Water)', 'Coumarin', 'Linalool'],
-  },
-];
+// Helper function to convert Firestore doc to Perfume object
+const fromFirestore = (doc): Perfume => {
+  const data = doc.data();
+  return {
+    id: doc.id,
+    name: data.name,
+    brand: data.brand,
+    price: data.price,
+    image: data.image,
+    gender: data.gender,
+    notes: data.notes,
+    description: data.description,
+    ingredients: data.ingredients,
+    featured: data.featured,
+    newArrival: data.newArrival,
+  };
+};
 
-export const getProducts = () => perfumes;
+export const getProducts = async (): Promise<Perfume[]> => {
+  try {
+    const productsCollection = collection(firestore, 'products');
+    const q = query(productsCollection, orderBy('createdAt', 'desc'));
+    const productSnapshot = await getDocs(q);
+    return productSnapshot.docs.map(fromFirestore);
+  } catch (error) {
+    console.error("Error fetching products:", error);
+    return [];
+  }
+};
 
-export const getProductById = (id: string) => perfumes.find((p) => p.id === id);
+export const getProductById = async (id: string): Promise<Perfume | null> => {
+  try {
+    const productDocRef = doc(firestore, 'products', id);
+    const productDoc = await getDoc(productDocRef);
 
-export const getFeaturedProducts = () => perfumes.filter((p) => p.featured);
+    if (productDoc.exists()) {
+      return fromFirestore(productDoc);
+    } else {
+      return null;
+    }
+  } catch (error) {
+    console.error("Error fetching product by ID:", error);
+    return null;
+  }
+};
 
-export const getNewArrivals = () => perfumes.filter((p) => p.newArrival);
+export const getFeaturedProducts = async (): Promise<Perfume[]> => {
+   try {
+    const productsCollection = collection(firestore, 'products');
+    const q = query(productsCollection, where('featured', '==', true), limit(6));
+    const productSnapshot = await getDocs(q);
+    return productSnapshot.docs.map(fromFirestore);
+  } catch (error) {
+    console.error("Error fetching featured products:", error);
+    return [];
+  }
+};
 
-export const searchProducts = (query: string) => {
-  if (!query) return perfumes;
-  return perfumes.filter(p => p.name.toLowerCase().includes(query.toLowerCase()));
-}
+export const getNewArrivals = async (): Promise<Perfume[]> => {
+  try {
+    const productsCollection = collection(firestore, 'products');
+    const q = query(productsCollection, where('newArrival', '==', true), limit(4));
+    const productSnapshot = await getDocs(q);
+    return productSnapshot.docs.map(fromFirestore);
+  } catch (error) {
+    console.error("Error fetching new arrivals:", error);
+    return [];
+  }
+};
