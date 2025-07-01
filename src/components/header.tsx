@@ -1,3 +1,4 @@
+
 // @ts-nocheck
 "use client";
 
@@ -19,6 +20,7 @@ import { UserNav } from "./user-nav";
 const navLinks = [
   { href: '/products', label: 'Shop' },
   { href: '/about', label: 'About Us' },
+  { href: '/contact', label: 'Contact' },
 ];
 
 export function Header() {
@@ -66,6 +68,7 @@ export function Header() {
             </SheetTrigger>
             <SheetContent side="left">
                <SheetHeader>
+                  <SheetTitle className="sr-only">Menu</SheetTitle>
                   <Link href="/" className="flex items-center space-x-2" onClick={() => setIsMobileMenuOpen(false)}>
                     <Diamond className="h-6 w-6 text-primary" />
                     <span className="font-bold font-headline text-lg">LORVÉ</span>
