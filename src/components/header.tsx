@@ -10,7 +10,7 @@ import Image from "next/image";
 import { Badge } from "./ui/badge";
 import { Separator } from "./ui/separator";
 import { useState } from "react";
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { cn } from "@/lib/utils";
 
 
@@ -20,9 +20,17 @@ const navLinks = [
 ];
 
 export function Header() {
-  const { cartItems, removeFromCart, updateQuantity, cartCount, totalPrice } = useCart();
+  const { cartItems, removeFromCart, updateQuantity, cartCount, totalPrice, clearCart } = useCart();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const pathname = usePathname();
+  const router = useRouter();
+
+  const handleCheckout = () => {
+    // In a real app, this would redirect to a payment gateway.
+    // For this demo, we'll just clear the cart and go to a success page.
+    clearCart();
+    router.push('/checkout/success');
+  }
 
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
@@ -141,7 +149,9 @@ export function Header() {
                             <span>Total</span>
                             <span>${totalPrice.toFixed(2)}</span>
                         </div>
-                        <Button className="w-full" size="lg">Proceed to Checkout</Button>
+                        <SheetClose asChild>
+                          <Button className="w-full" size="lg" onClick={handleCheckout}>Proceed to Checkout</Button>
+                        </SheetClose>
                         <SheetClose asChild>
                            <Button variant="outline" className="w-full">Continue Shopping</Button>
                         </SheetClose>

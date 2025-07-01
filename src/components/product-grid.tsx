@@ -12,6 +12,7 @@ import { Checkbox } from './ui/checkbox';
 import { useSearchParams } from 'next/navigation';
 import { Filter } from 'lucide-react';
 import { Sheet, SheetContent, SheetTrigger, SheetHeader, SheetTitle, SheetFooter } from './ui/sheet';
+import { motion } from 'framer-motion';
 
 interface ProductGridProps {
   allProducts: Perfume[];
@@ -32,6 +33,7 @@ export default function ProductGrid({ allProducts }: ProductGridProps) {
   const [sortOrder, setSortOrder] = useState('featured');
   const [genderFilter, setGenderFilter] = useState(searchParams.get('gender') || 'All');
   const [priceRange, setPriceRange] = useState([0, 300]);
+  const [displayPriceRange, setDisplayPriceRange] = useState([0, 300]);
   const [selectedNotes, setSelectedNotes] = useState<string[]>([]);
   const [isFiltersOpen, setIsFiltersOpen] = useState(false);
 
@@ -80,6 +82,16 @@ export default function ProductGrid({ allProducts }: ProductGridProps) {
       prev.includes(note) ? prev.filter(n => n !== note) : [...prev, note]
     );
   };
+  
+  const containerVariants = {
+    hidden: { opacity: 1 },
+    visible: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.05,
+      },
+    },
+  };
 
   const FilterPanel = () => (
     <div className="space-y-8">
@@ -100,11 +112,13 @@ export default function ProductGrid({ allProducts }: ProductGridProps) {
                 min={0}
                 max={300}
                 step={10}
-                onValueChange={setPriceRange}
+                value={displayPriceRange}
+                onValueChange={setDisplayPriceRange}
+                onValueCommit={setPriceRange}
             />
             <div className="flex justify-between text-sm text-muted-foreground mt-2">
-                <span>${priceRange[0]}</span>
-                <span>${priceRange[1]}</span>
+                <span>${displayPriceRange[0]}</span>
+                <span>${displayPriceRange[1]}</span>
             </div>
         </div>
         <div>
@@ -180,11 +194,17 @@ export default function ProductGrid({ allProducts }: ProductGridProps) {
         </div>
         
         {filteredAndSortedProducts.length > 0 ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6">
+          <motion.div 
+            key={genderFilter + priceRange.join('-') + selectedNotes.join('-') + sortOrder}
+            className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6"
+            variants={containerVariants}
+            initial="hidden"
+            animate="visible"
+          >
             {filteredAndSortedProducts.map(product => (
               <PerfumeCard key={product.id} perfume={product} />
             ))}
-          </div>
+          </motion.div>
         ) : (
           <div className="text-center py-16">
               <h2 className="font-headline text-2xl">No Products Found</h2>
