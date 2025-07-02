@@ -1,3 +1,4 @@
+
 import type { Metadata } from 'next';
 import './globals.css';
 import { cn } from '@/lib/utils';
@@ -7,6 +8,7 @@ import { Footer } from '@/components/footer';
 import { Toaster } from '@/components/ui/toaster';
 import { CartProvider } from '@/context/cart-provider';
 import { AuthProvider } from '@/context/auth-provider';
+import { FloatingCartButton } from '@/components/floating-cart-button';
 
 export const metadata: Metadata = {
   title: 'LORVÉ',
@@ -34,6 +36,7 @@ export default function RootLayout({
                 <main className="flex-1">{children}</main>
                 <Footer />
               </div>
+              <FloatingCartButton />
               <Toaster />
             </CartProvider>
           </AuthProvider>
