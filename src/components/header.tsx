@@ -119,12 +119,13 @@ export function Header() {
           </nav>
         </div>
 
-        {/* MOBILE: MENU TRIGGER */}
-        <div className="md:hidden">
+        {/* MOBILE HEADER */}
+        <div className="flex w-full items-center justify-between md:hidden">
+          {/* Left: Menu Button */}
           <Sheet open={isMobileMenuOpen} onOpenChange={setIsMobileMenuOpen}>
             <SheetTrigger asChild>
               <Button variant="ghost" size="icon">
-                <Menu className="h-6 w-6" />
+                <Menu className="h-7 w-7" />
               </Button>
             </SheetTrigger>
             <SheetContent side="left" className="flex w-full flex-col">
@@ -181,18 +182,19 @@ export function Header() {
               </SheetFooter>
             </SheetContent>
           </Sheet>
-        </div>
-        
-        {/* MOBILE: LOGO */}
-        <div className="flex justify-center flex-1 md:hidden">
-            <Link href="/" className="flex items-center space-x-2">
-                <Diamond className="h-6 w-6 text-primary" />
-                <span className="font-bold font-headline text-lg">LORVÉ</span>
-            </Link>
+
+          {/* Center: Logo */}
+          <Link href="/" className="flex items-center space-x-2">
+            <Diamond className="h-6 w-6 text-primary" />
+            <span className="font-bold font-headline text-lg">LORVÉ</span>
+          </Link>
+
+          {/* Right: Spacer to balance menu button */}
+          <div className="w-10" />
         </div>
 
         {/* DESKTOP: ACTIONS */}
-        <div className="hidden flex-1 items-center justify-end space-x-2 md:flex">
+        <div className="hidden flex-1 items-center justify-end md:flex">
           <Sheet>
             <SheetTrigger asChild>
               <Button variant="ghost" size="icon" className="relative">
