@@ -9,35 +9,35 @@ export default async function Home() {
 
   return (
     <div className="flex flex-col">
-      <section className="relative h-[60vh] min-h-[400px] w-full bg-gradient-to-r from-primary/80 to-accent/20 text-primary-foreground">
-        <Image 
-          src="https://placehold.co/1800x1200.png" 
-          alt="Elegant perfume display" 
-          layout="fill" 
-          objectFit="cover" 
-          className="z-0 opacity-30"
-          data-ai-hint="elegant perfume"
-        />
-        <div className="container mx-auto flex h-full flex-col items-center justify-center text-center relative z-10">
-          <h1 className="font-headline text-4xl font-bold md:text-6xl lg:text-7xl">
-            Experience LORVÉ
+      <section className="bg-background py-20 sm:py-28">
+        <div className="container mx-auto flex flex-col items-center justify-center text-center px-4">
+          <h1 className="font-headline text-7xl font-bold tracking-[0.15em] text-foreground md:text-9xl">
+            LORVÉ
           </h1>
-          <p className="mt-4 max-w-2xl text-lg md:text-xl">
-            Discover a world of exquisite fragrances, crafted for the modern connoisseur.
+          <p className="mt-4 text-base font-normal tracking-[0.4em] uppercase text-foreground/80 md:text-lg">
+            Reign with Aura
           </p>
-          <Button asChild size="lg" className="mt-8 bg-accent text-accent-foreground hover:bg-accent/90">
-            <Link href="/products">Explore The Collection</Link>
-          </Button>
+          <p className="mt-10 max-w-2xl text-lg leading-relaxed text-foreground/80">
+            Lorvè is a fragrance house rooted in India's rich perfumery heritage, blending the timeless art of traditional scent-making with modern luxury and elegance. Every bottle is a heartfelt expression—crafted with pride, purity, and purpose—to turn dreams into lasting experiences, built on trust and soul.
+          </p>
+          <div className="mt-16 text-sm font-medium tracking-[0.2em] uppercase text-foreground/60 flex flex-wrap justify-center items-center gap-x-6 gap-y-2">
+            <span>Pride</span>
+            <span>Purity</span>
+            <span>Honesty</span>
+            <span>Soul</span>
+            <span>Heritage</span>
+            <span>Elegance</span>
+          </div>
         </div>
       </section>
 
-      <section className="bg-background py-16 sm:py-24">
+      <section className="bg-secondary py-16 sm:py-24">
         <div className="container mx-auto">
           <div className="text-center mb-12">
             <h2 className="font-headline text-3xl font-bold md:text-4xl">
-              Our Collection
+              Discover the Collection
             </h2>
-             <p className="text-muted-foreground mt-2 text-lg">Explore our curated selection of fine fragrances.</p>
+             <p className="text-muted-foreground mt-2 text-lg">Handcrafted fragrances for the discerning individual.</p>
           </div>
           {allProducts.length > 0 ? (
             <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
