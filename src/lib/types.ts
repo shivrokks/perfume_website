@@ -8,7 +8,7 @@ export interface Perfume {
   notes: string[];
   description: string;
   ingredients: string[];
-  category: 'Perfume' | 'Oils';
+  category?: 'Perfume' | 'Oils';
   size: string;
 }
 

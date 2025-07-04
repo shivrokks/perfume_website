@@ -15,7 +15,7 @@ const fromFirestore = (doc): Perfume => {
     notes: data.notes,
     description: data.description,
     ingredients: data.ingredients,
-    category: data.category || 'Perfume',
+    category: data.category,
     size: data.size || 'N/A',
   };
 };
