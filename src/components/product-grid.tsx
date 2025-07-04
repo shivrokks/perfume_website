@@ -29,15 +29,18 @@ export default function ProductGrid({ allProducts }: ProductGridProps) {
   const filteredAndSortedProducts = useMemo(() => {
     let products = [...allProducts];
 
-    // Filter by category
-    if (categoryFilter === 'Perfume') {
-      // Show perfumes and legacy products (without a category)
-      products = products.filter(p => p.category === 'Perfume' || !p.category);
-    } else if (categoryFilter === 'Oils') {
-      // Show only oils
-      products = products.filter(p => p.category === 'Oils');
+    // Filter by category (case-insensitive and trims whitespace)
+    const normalizedCategoryFilter = categoryFilter.toLowerCase();
+    if (normalizedCategoryFilter !== 'all') {
+      if (normalizedCategoryFilter === 'perfume') {
+        products = products.filter(p => {
+          const category = p.category?.toLowerCase().trim();
+          return category === 'perfume' || !category; // Handles legacy products
+        });
+      } else if (normalizedCategoryFilter === 'oils') {
+        products = products.filter(p => p.category?.toLowerCase().trim() === 'oils');
+      }
     }
-    // If 'All', do no category filtering.
 
     // Filter by gender
     if (genderFilter !== 'All') {
