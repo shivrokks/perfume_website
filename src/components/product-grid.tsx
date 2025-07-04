@@ -22,7 +22,7 @@ export default function ProductGrid({ allProducts }: ProductGridProps) {
 
   const [sortOrder, setSortOrder] = useState('featured');
   const [genderFilter, setGenderFilter] = useState(searchParams.get('gender') || 'All');
-  const [categoryFilter, setCategoryFilter] = useState(searchParams.get('category') || 'All');
+  const [categoryFilter, setCategoryFilter] = useState(search_params.get('category') || 'All');
   const [priceRange, setPriceRange] = useState([0, 300]);
   const [isFiltersOpen, setIsFiltersOpen] = useState(false);
 
@@ -30,8 +30,10 @@ export default function ProductGrid({ allProducts }: ProductGridProps) {
     let products = [...allProducts];
 
     // Filter by category
-    if (categoryFilter !== 'All') {
-      products = products.filter(p => p.category === categoryFilter);
+    if (categoryFilter === 'Perfume') {
+      products = products.filter(p => p.category === 'Perfume' || !p.category);
+    } else if (categoryFilter === 'Oils') {
+      products = products.filter(p => p.category === 'Oils');
     }
 
     // Filter by gender
