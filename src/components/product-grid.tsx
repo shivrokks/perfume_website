@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useState, useMemo } from 'react';
@@ -22,7 +21,7 @@ export default function ProductGrid({ allProducts }: ProductGridProps) {
 
   const [sortOrder, setSortOrder] = useState('featured');
   const [genderFilter, setGenderFilter] = useState(searchParams.get('gender') || 'All');
-  const [categoryFilter, setCategoryFilter] = useState(search_params.get('category') || 'All');
+  const [categoryFilter, setCategoryFilter] = useState(searchParams.get('category') || 'All');
   const [priceRange, setPriceRange] = useState([0, 300]);
   const [isFiltersOpen, setIsFiltersOpen] = useState(false);
 
