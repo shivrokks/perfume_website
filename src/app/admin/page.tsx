@@ -105,6 +105,7 @@ export default function AdminPage() {
     setEditingProduct(product);
     form.reset({
       ...product,
+      category: product.category || 'Perfume',
       notes: product.notes.join(', '),
       ingredients: product.ingredients.join(', '),
     });
