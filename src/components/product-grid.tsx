@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useState, useMemo } from 'react';
@@ -23,20 +22,40 @@ export default function ProductGrid({ allProducts }: ProductGridProps) {
   const [sortOrder, setSortOrder] = useState('featured');
   const [genderFilter, setGenderFilter] = useState(searchParams.get('gender') || 'All');
   const [categoryFilter, setCategoryFilter] = useState(searchParams.get('category') || 'All');
-  const [priceRange, setPriceRange] = useState([0, 300]);
+  
+  // Calculate price range based on actual products
+  const priceRange = useMemo(() => {
+    if (allProducts.length === 0) return [0, 300];
+    const prices = allProducts.map(p => p.price);
+    const minPrice = Math.floor(Math.min(...prices));
+    const maxPrice = Math.ceil(Math.max(...prices));
+    return [minPrice, maxPrice];
+  }, [allProducts]);
+
+  const [selectedPriceRange, setSelectedPriceRange] = useState<[number, number]>([0, 300]);
   const [isFiltersOpen, setIsFiltersOpen] = useState(false);
+
+  // Update price range when products change
+  useMemo(() => {
+    if (allProducts.length > 0) {
+      setSelectedPriceRange([priceRange[0], priceRange[1]]);
+    }
+  }, [priceRange, allProducts]);
 
   const filteredAndSortedProducts = useMemo(() => {
     let products = [...allProducts];
 
-    // Filter by category
-    if (categoryFilter === 'Perfume') {
-      // A product is considered a 'Perfume' if its category is not 'Oils'.
-      // This includes items explicitly marked 'Perfume' and uncategorized items.
-      products = products.filter(p => p.category !== 'Oils');
-    } else if (categoryFilter === 'Oils') {
-      // A product is an 'Oil' only if its category is explicitly 'Oils'.
-      products = products.filter(p => p.category === 'Oils');
+    // Filter by category - Fixed logic
+    if (categoryFilter !== 'All') {
+      if (categoryFilter === 'Oils') {
+        products = products.filter(p => p.category === 'Oils');
+      } else if (categoryFilter === 'Perfume') {
+        // Include products that are explicitly "Perfume" category or have no category specified
+        products = products.filter(p => p.category === 'Perfume' || p.category === '' || p.category === undefined);
+      } else {
+        // For any other specific category
+        products = products.filter(p => p.category === categoryFilter);
+      }
     }
 
     // Filter by gender
@@ -44,10 +63,10 @@ export default function ProductGrid({ allProducts }: ProductGridProps) {
       products = products.filter(p => p.gender === genderFilter);
     }
 
-    // Filter by price
-    products = products.filter(p => p.price >= priceRange[0] && p.price <= priceRange[1]);
+    // Filter by price - Fixed to use selectedPriceRange
+    products = products.filter(p => p.price >= selectedPriceRange[0] && p.price <= selectedPriceRange[1]);
     
-    // Sort
+    // Sort products
     switch (sortOrder) {
       case 'price-asc':
         products.sort((a, b) => a.price - b.price);
@@ -63,12 +82,24 @@ export default function ProductGrid({ allProducts }: ProductGridProps) {
         break;
       case 'featured':
       default:
-        // Optional: could add a more sophisticated featured sort
+        // Keep original order for featured
         break;
     }
 
     return products;
-  }, [allProducts, genderFilter, categoryFilter, priceRange, sortOrder]);
+  }, [allProducts, genderFilter, categoryFilter, selectedPriceRange, sortOrder]);
+
+  // Get unique categories from products
+  const availableCategories = useMemo(() => {
+    const categories = new Set(allProducts.map(p => p.category).filter(Boolean));
+    return ['All', ...Array.from(categories)];
+  }, [allProducts]);
+
+  // Get unique genders from products
+  const availableGenders = useMemo(() => {
+    const genders = new Set(allProducts.map(p => p.gender).filter(Boolean));
+    return ['All', ...Array.from(genders)];
+  }, [allProducts]);
   
   const containerVariants = {
     hidden: { opacity: 1 },
@@ -83,25 +114,34 @@ export default function ProductGrid({ allProducts }: ProductGridProps) {
   const FilterPanel = () => {
     const handleMinPriceChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const newMin = Number(e.target.value);
-        if (!isNaN(newMin) && newMin >= 0 && newMin <= priceRange[1]) {
-            setPriceRange([newMin, priceRange[1]]);
+        if (!isNaN(newMin) && newMin >= 0 && newMin <= selectedPriceRange[1]) {
+            setSelectedPriceRange([newMin, selectedPriceRange[1]]);
         }
     };
 
     const handleMaxPriceChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const newMax = Number(e.target.value);
-        if (!isNaN(newMax) && newMax <= 300 && newMax >= priceRange[0]) {
-            setPriceRange([priceRange[0], newMax]);
+        if (!isNaN(newMax) && newMax <= priceRange[1] && newMax >= selectedPriceRange[0]) {
+            setSelectedPriceRange([selectedPriceRange[0], newMax]);
         }
+    };
+
+    const handleSliderChange = (value: number[]) => {
+        setSelectedPriceRange([value[0], value[1]]);
     };
 
     return (
         <div className="space-y-8">
-             <div>
+            <div>
                 <h3 className="font-headline text-lg mb-4">Category</h3>
                 <div className="flex flex-col gap-2">
-                    {['All', 'Perfume', 'Oils'].map(c => (
-                        <Button key={c} variant={categoryFilter === c ? 'default' : 'ghost'} onClick={() => setCategoryFilter(c)} className="justify-start">
+                    {availableCategories.map(c => (
+                        <Button 
+                            key={c} 
+                            variant={categoryFilter === c ? 'default' : 'ghost'} 
+                            onClick={() => setCategoryFilter(c)} 
+                            className="justify-start"
+                        >
                             {c}
                         </Button>
                     ))}
@@ -110,8 +150,13 @@ export default function ProductGrid({ allProducts }: ProductGridProps) {
             <div>
                 <h3 className="font-headline text-lg mb-4">Gender</h3>
                 <div className="flex flex-col gap-2">
-                    {['All', 'Men', 'Women', 'Unisex'].map(g => (
-                        <Button key={g} variant={genderFilter === g ? 'default' : 'ghost'} onClick={() => setGenderFilter(g)} className="justify-start">
+                    {availableGenders.map(g => (
+                        <Button 
+                            key={g} 
+                            variant={genderFilter === g ? 'default' : 'ghost'} 
+                            onClick={() => setGenderFilter(g)} 
+                            className="justify-start"
+                        >
                             {g}
                         </Button>
                     ))}
@@ -124,8 +169,10 @@ export default function ProductGrid({ allProducts }: ProductGridProps) {
                         <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground">$</span>
                         <Input
                             type="number"
-                            value={priceRange[0]}
+                            value={selectedPriceRange[0]}
                             onChange={handleMinPriceChange}
+                            min={0}
+                            max={priceRange[1]}
                             className="pl-6"
                             aria-label="Minimum price"
                         />
@@ -135,20 +182,27 @@ export default function ProductGrid({ allProducts }: ProductGridProps) {
                         <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground">$</span>
                         <Input
                             type="number"
-                            value={priceRange[1]}
+                            value={selectedPriceRange[1]}
                             onChange={handleMaxPriceChange}
+                            min={0}
+                            max={priceRange[1]}
                             className="pl-6"
                             aria-label="Maximum price"
                         />
                     </div>
                 </div>
                 <Slider
-                    value={priceRange}
-                    onValueChange={setPriceRange}
-                    max={300}
-                    min={0}
+                    value={selectedPriceRange}
+                    onValueChange={handleSliderChange}
+                    max={priceRange[1]}
+                    min={priceRange[0]}
                     step={5}
+                    className="w-full"
                 />
+                <div className="flex justify-between text-sm text-muted-foreground mt-2">
+                    <span>${priceRange[0]}</span>
+                    <span>${priceRange[1]}</span>
+                </div>
             </div>
         </div>
     );
@@ -162,7 +216,7 @@ export default function ProductGrid({ allProducts }: ProductGridProps) {
       </aside>
 
       {/* Mobile Filters */}
-       <div className="lg:hidden col-span-full flex justify-between items-center mb-4">
+      <div className="lg:hidden col-span-full flex justify-between items-center mb-4">
         <Sheet open={isFiltersOpen} onOpenChange={setIsFiltersOpen}>
             <SheetTrigger asChild>
                 <Button variant="outline">
@@ -182,7 +236,7 @@ export default function ProductGrid({ allProducts }: ProductGridProps) {
                 </SheetFooter>
             </SheetContent>
         </Sheet>
-         <Select onValueChange={setSortOrder} defaultValue="featured">
+        <Select onValueChange={setSortOrder} defaultValue="featured">
           <SelectTrigger className="w-[180px]">
             <SelectValue placeholder="Sort by" />
           </SelectTrigger>
@@ -197,8 +251,11 @@ export default function ProductGrid({ allProducts }: ProductGridProps) {
       </div>
 
       <main className="col-span-full lg:col-span-3">
-        <div className="hidden lg:flex justify-end mb-4">
-           <Select onValueChange={setSortOrder} defaultValue="featured">
+        <div className="hidden lg:flex justify-between items-center mb-4">
+          <p className="text-sm text-muted-foreground">
+            Showing {filteredAndSortedProducts.length} of {allProducts.length} products
+          </p>
+          <Select onValueChange={setSortOrder} defaultValue="featured">
             <SelectTrigger className="w-[180px]">
               <SelectValue placeholder="Sort by" />
             </SelectTrigger>
@@ -214,7 +271,7 @@ export default function ProductGrid({ allProducts }: ProductGridProps) {
         
         {filteredAndSortedProducts.length > 0 ? (
           <motion.div 
-            key={genderFilter + categoryFilter + priceRange.join('-') + sortOrder}
+            key={`${genderFilter}-${categoryFilter}-${selectedPriceRange.join('-')}-${sortOrder}`}
             className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6"
             variants={containerVariants}
             initial="hidden"
@@ -228,6 +285,17 @@ export default function ProductGrid({ allProducts }: ProductGridProps) {
           <div className="text-center py-16">
               <h2 className="font-headline text-2xl">No Products Found</h2>
               <p className="text-muted-foreground mt-2">Try adjusting your filters to find what you're looking for.</p>
+              <Button 
+                variant="outline" 
+                className="mt-4"
+                onClick={() => {
+                  setGenderFilter('All');
+                  setCategoryFilter('All');
+                  setSelectedPriceRange([priceRange[0], priceRange[1]]);
+                }}
+              >
+                Reset Filters
+              </Button>
           </div>
         )}
       </main>

@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useEffect, useState } from 'react';
@@ -19,19 +18,27 @@ interface ProductDetailsProps {
 export default function ProductDetails({ product }: ProductDetailsProps) {
   const { addToCart } = useCart();
   const [oilQuantity, setOilQuantity] = useState(100);
+  const [viewingHistory, setViewingHistory] = useState<string[]>([]);
 
   const isOil = product.category === 'Oils';
   const oilTotalPrice = isOil ? (product.price / 100) * oilQuantity : 0;
 
   useEffect(() => {
-    const history = JSON.parse(localStorage.getItem('viewingHistory') || '[]');
-    const newHistory = [product.name, ...history.filter((p: string) => p !== product.name)].slice(0, 10);
-    localStorage.setItem('viewingHistory', JSON.stringify(newHistory));
+    // Use state instead of localStorage for viewing history
+    setViewingHistory(prev => {
+      const newHistory = [product.name, ...prev.filter((p: string) => p !== product.name)].slice(0, 10);
+      return newHistory;
+    });
   }, [product.name]);
 
   const handleAddToCart = () => {
     const quantityToAdd = isOil ? oilQuantity : 1;
     addToCart(product, quantityToAdd);
+  };
+
+  const handleQuantityChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = parseInt(e.target.value) || 0;
+    setOilQuantity(Math.max(0, value)); // Removed max limit
   };
 
   return (
@@ -64,7 +71,7 @@ export default function ProductDetails({ product }: ProductDetailsProps) {
                     id="quantity" 
                     type="number" 
                     value={oilQuantity}
-                    onChange={(e) => setOilQuantity(Math.max(0, parseInt(e.target.value) || 0))}
+                    onChange={handleQuantityChange}
                     min="0"
                     step="50"
                     className="w-32"
