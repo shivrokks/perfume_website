@@ -31,7 +31,13 @@ export default function ProductGrid({ allProducts }: ProductGridProps) {
 
     // Filter by category
     if (categoryFilter !== 'All') {
-      products = products.filter(p => p.category === categoryFilter);
+      if (categoryFilter === 'Perfume') {
+        // Legacy products without a category are considered Perfumes
+        products = products.filter(p => p.category === 'Perfume' || !p.category);
+      } else {
+        // For other categories, be strict
+        products = products.filter(p => p.category === categoryFilter);
+      }
     }
 
     // Filter by gender
