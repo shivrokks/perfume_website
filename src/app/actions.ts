@@ -1,3 +1,4 @@
+
 "use server";
 
 import { z } from "zod";
@@ -7,7 +8,7 @@ import { collection, addDoc, serverTimestamp, doc, getDoc, setDoc, updateDoc, de
 import { revalidatePath } from "next/cache";
 import type { Address } from "@/lib/types";
 
-// Schema for validating form fields, excluding the file upload
+// Schema for validating form fields
 const ProductFormSchema = z.object({
   name: z.string().min(1, "Name is required"),
   brand: z.string().min(1, "Brand is required"),
@@ -29,6 +30,11 @@ const ProductFormSchema = z.object({
 });
 
 async function uploadImage(file: File): Promise<string> {
+  if (!file || typeof file.arrayBuffer !== 'function') {
+      console.error('UploadImage Error: Invalid file object received.', file);
+      throw new Error('Invalid file was provided for upload.');
+  }
+
   const fileBuffer = await file.arrayBuffer();
   const mime = file.type;
   const encoding = 'base64';
@@ -40,17 +46,34 @@ async function uploadImage(file: File): Promise<string> {
       folder: 'lorve-products',
     });
     return result.secure_url;
-  } catch (error) {
+  } catch (error: any) {
     console.error('Cloudinary Upload Error:', error);
-    throw new Error('Failed to upload image to Cloudinary.');
+    let errorMessage = 'Image upload failed due to a server error.';
+    if (error.http_code === 401 || error.message?.includes('invalid signature')) {
+      errorMessage = 'Could not authenticate with Cloudinary. Please check your API credentials in the .env file.';
+    } else if (error.message) {
+      errorMessage = `Upload Error: ${error.message}`;
+    }
+    throw new Error(errorMessage);
   }
 }
 
 export async function addProduct(formData: FormData) {
-  const values = Object.fromEntries(formData.entries());
-  const imageFile = formData.get('image') as File;
+  const imageFile = formData.get('image') as File | null;
+  
+  const rawData = {
+    name: formData.get('name'),
+    brand: formData.get('brand'),
+    price: formData.get('price'),
+    gender: formData.get('gender'),
+    category: formData.get('category'),
+    size: formData.get('size'),
+    notes: formData.get('notes'),
+    description: formData.get('description'),
+    ingredients: formData.get('ingredients'),
+  };
 
-  const parsed = ProductFormSchema.safeParse(values);
+  const parsed = ProductFormSchema.safeParse(rawData);
 
   if (!parsed.success) {
     return {
@@ -98,11 +121,22 @@ export async function addProduct(formData: FormData) {
 }
 
 export async function updateProduct(id: string, formData: FormData) {
-  const values = Object.fromEntries(formData.entries());
-  const imageFile = formData.get('image') as File;
-  const existingImageUrl = values.image_url as string;
+  const imageFile = formData.get('image') as File | null;
+  const existingImageUrl = formData.get('image_url') as string | null;
 
-  const parsed = ProductFormSchema.safeParse(values);
+  const rawData = {
+    name: formData.get('name'),
+    brand: formData.get('brand'),
+    price: formData.get('price'),
+    gender: formData.get('gender'),
+    category: formData.get('category'),
+    size: formData.get('size'),
+    notes: formData.get('notes'),
+    description: formData.get('description'),
+    ingredients: formData.get('ingredients'),
+  };
+
+  const parsed = ProductFormSchema.safeParse(rawData);
 
   if (!parsed.success) {
     return {
@@ -111,7 +145,7 @@ export async function updateProduct(id: string, formData: FormData) {
     };
   }
   
-  let finalImageUrl = existingImageUrl;
+  let finalImageUrl = existingImageUrl || "";
   if (imageFile && imageFile.size > 0) {
     try {
       finalImageUrl = await uploadImage(imageFile);
