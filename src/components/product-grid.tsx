@@ -30,10 +30,8 @@ export default function ProductGrid({ allProducts }: ProductGridProps) {
     let products = [...allProducts];
 
     // Filter by category
-    if (categoryFilter === 'Perfume') {
-        products = products.filter(p => p.category === 'Perfume' || !p.category);
-    } else if (categoryFilter === 'Oils') {
-        products = products.filter(p => p.category === 'Oils');
+    if (categoryFilter !== 'All') {
+      products = products.filter(p => p.category === categoryFilter);
     }
 
     // Filter by gender
