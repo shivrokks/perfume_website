@@ -3,11 +3,13 @@
 
 import { z } from "zod";
 import { firestore } from "@/lib/firebase";
+import cloudinary from "@/lib/cloudinary";
 import { collection, addDoc, serverTimestamp, doc, getDoc, setDoc, updateDoc, deleteDoc } from "firebase/firestore";
 import { revalidatePath } from "next/cache";
 import type { Address } from "@/lib/types";
 
-const ProductSchema = z.object({
+// Schema for validating form fields, excluding the file upload
+const ProductFormSchema = z.object({
   name: z.string().min(1, "Name is required"),
   brand: z.string().min(1, "Brand is required"),
   price: z.coerce.number().min(0, "Price must be a positive number"),
@@ -17,7 +19,6 @@ const ProductSchema = z.object({
   notes: z.string().min(1, "Notes are required"),
   description: z.string().min(1, "Description is required"),
   ingredients: z.string().min(1, "Ingredients are required"),
-  image: z.string().url("Must be a valid placeholder URL").optional(),
 }).superRefine((data, ctx) => {
   if (data.category === 'Perfume' && (!data.size || data.size.trim() === '')) {
     ctx.addIssue({
@@ -28,14 +29,29 @@ const ProductSchema = z.object({
   }
 });
 
+async function uploadImage(file: File): Promise<string> {
+  const fileBuffer = await file.arrayBuffer();
+  const mime = file.type;
+  const encoding = 'base64';
+  const base64Data = Buffer.from(fileBuffer).toString('base64');
+  const fileUri = 'data:' + mime + ';' + encoding + ',' + base64Data;
+
+  try {
+    const result = await cloudinary.uploader.upload(fileUri, {
+      folder: 'lorve-products',
+    });
+    return result.secure_url;
+  } catch (error) {
+    console.error('Cloudinary Upload Error:', error);
+    throw new Error('Failed to upload image to Cloudinary.');
+  }
+}
 
 export async function addProduct(formData: FormData) {
   const values = Object.fromEntries(formData.entries());
+  const imageFile = values.image as File;
 
-  const parsed = ProductSchema.safeParse({
-    ...values,
-    price: Number(values.price),
-  });
+  const parsed = ProductFormSchema.safeParse(values);
 
   if (!parsed.success) {
     return {
@@ -44,14 +60,28 @@ export async function addProduct(formData: FormData) {
     };
   }
   
-  const productData = parsed.data;
+  let imageUrl = "https://placehold.co/600x600.png";
+  if (imageFile && imageFile.size > 0) {
+    try {
+      imageUrl = await uploadImage(imageFile);
+    } catch (uploadError: any) {
+      return {
+        success: false,
+        error: { _global: [uploadError.message] },
+      };
+    }
+  }
+
+  const productData = {
+    ...parsed.data,
+    image: imageUrl,
+  };
 
   try {
     await addDoc(collection(firestore, "products"), {
       ...productData,
       notes: productData.notes.split(',').map(note => note.trim()),
       ingredients: productData.ingredients.split(',').map(ing => ing.trim()),
-      image: productData.image || "https://placehold.co/600x600.png",
       createdAt: serverTimestamp(),
     });
 
@@ -70,11 +100,10 @@ export async function addProduct(formData: FormData) {
 
 export async function updateProduct(id: string, formData: FormData) {
   const values = Object.fromEntries(formData.entries());
+  const imageFile = values.image as File;
+  const existingImageUrl = values.image_url as string;
 
-  const parsed = ProductSchema.safeParse({
-    ...values,
-    price: Number(values.price),
-  });
+  const parsed = ProductFormSchema.safeParse(values);
 
   if (!parsed.success) {
     return {
@@ -83,7 +112,22 @@ export async function updateProduct(id: string, formData: FormData) {
     };
   }
   
-  const productData = parsed.data;
+  let finalImageUrl = existingImageUrl;
+  if (imageFile && imageFile.size > 0) {
+    try {
+      finalImageUrl = await uploadImage(imageFile);
+    } catch (uploadError: any) {
+       return {
+        success: false,
+        error: { _global: [uploadError.message] },
+      };
+    }
+  }
+
+  const productData = {
+    ...parsed.data,
+    image: finalImageUrl,
+  };
 
   try {
     const productRef = doc(firestore, "products", id);
@@ -91,7 +135,6 @@ export async function updateProduct(id: string, formData: FormData) {
       ...productData,
       notes: productData.notes.split(',').map(note => note.trim()),
       ingredients: productData.ingredients.split(',').map(ing => ing.trim()),
-      image: productData.image || "https://placehold.co/600x600.png",
       updatedAt: serverTimestamp(),
     });
 
