@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState, useMemo } from 'react';
@@ -30,8 +31,11 @@ export default function ProductGrid({ allProducts }: ProductGridProps) {
 
     // Filter by category
     if (categoryFilter === 'Perfume') {
-      products = products.filter(p => p.category === 'Perfume' || !p.category);
+      // A product is considered a 'Perfume' if its category is not 'Oils'.
+      // This includes items explicitly marked 'Perfume' and uncategorized items.
+      products = products.filter(p => p.category !== 'Oils');
     } else if (categoryFilter === 'Oils') {
+      // A product is an 'Oil' only if its category is explicitly 'Oils'.
       products = products.filter(p => p.category === 'Oils');
     }
 
