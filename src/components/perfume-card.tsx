@@ -51,7 +51,10 @@ export default function PerfumeCard({ perfume }: PerfumeCardProps) {
             </Link>
             <p className="text-sm text-muted-foreground">{perfume.brand}</p>
           </div>
-          <p className="mt-2 font-semibold">${perfume.price.toFixed(2)}</p>
+          <div className="flex justify-between items-center mt-2">
+            <p className="font-semibold">${perfume.price.toFixed(2)}</p>
+            <p className="text-sm text-muted-foreground">{perfume.size}</p>
+          </div>
         </CardContent>
         <CardFooter className="p-4 pt-0">
           {itemInCart ? (

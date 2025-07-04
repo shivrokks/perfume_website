@@ -22,11 +22,17 @@ export default function ProductGrid({ allProducts }: ProductGridProps) {
 
   const [sortOrder, setSortOrder] = useState('featured');
   const [genderFilter, setGenderFilter] = useState(searchParams.get('gender') || 'All');
+  const [categoryFilter, setCategoryFilter] = useState(searchParams.get('category') || 'All');
   const [priceRange, setPriceRange] = useState([0, 300]);
   const [isFiltersOpen, setIsFiltersOpen] = useState(false);
 
   const filteredAndSortedProducts = useMemo(() => {
     let products = [...allProducts];
+
+    // Filter by category
+    if (categoryFilter !== 'All') {
+      products = products.filter(p => p.category === categoryFilter);
+    }
 
     // Filter by gender
     if (genderFilter !== 'All') {
@@ -57,7 +63,7 @@ export default function ProductGrid({ allProducts }: ProductGridProps) {
     }
 
     return products;
-  }, [allProducts, genderFilter, priceRange, sortOrder]);
+  }, [allProducts, genderFilter, categoryFilter, priceRange, sortOrder]);
   
   const containerVariants = {
     hidden: { opacity: 1 },
@@ -86,6 +92,16 @@ export default function ProductGrid({ allProducts }: ProductGridProps) {
 
     return (
         <div className="space-y-8">
+             <div>
+                <h3 className="font-headline text-lg mb-4">Category</h3>
+                <div className="flex flex-col gap-2">
+                    {['All', 'Perfume', 'Oils'].map(c => (
+                        <Button key={c} variant={categoryFilter === c ? 'default' : 'ghost'} onClick={() => setCategoryFilter(c)} className="justify-start">
+                            {c}
+                        </Button>
+                    ))}
+                </div>
+            </div>
             <div>
                 <h3 className="font-headline text-lg mb-4">Gender</h3>
                 <div className="flex flex-col gap-2">
@@ -193,7 +209,7 @@ export default function ProductGrid({ allProducts }: ProductGridProps) {
         
         {filteredAndSortedProducts.length > 0 ? (
           <motion.div 
-            key={genderFilter + priceRange.join('-') + sortOrder}
+            key={genderFilter + categoryFilter + priceRange.join('-') + sortOrder}
             className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6"
             variants={containerVariants}
             initial="hidden"

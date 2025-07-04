@@ -27,6 +27,8 @@ const ProductSchema = z.object({
   brand: z.string().min(1, "Brand is required"),
   price: z.coerce.number().min(0, "Price must be a positive number"),
   gender: z.enum(["Men", "Women", "Unisex"]),
+  category: z.enum(['Perfume', 'Oils']),
+  size: z.string().min(1, "Size is required (e.g. 50ml, 200kg)"),
   notes: z.string().min(1, "Provide comma-separated notes"),
   description: z.string().min(1, "Description is required"),
   ingredients: z.string().min(1, "Provide comma-separated ingredients"),
@@ -38,6 +40,8 @@ const defaultFormValues = {
   brand: 'LORVÉ',
   price: 100,
   gender: 'Unisex' as const,
+  category: 'Perfume' as const,
+  size: '50ml',
   notes: '',
   description: '',
   ingredients: '',
@@ -172,7 +176,7 @@ export default function AdminPage() {
     <div className="container mx-auto py-12 space-y-12">
       <Card className="max-w-4xl mx-auto">
         <CardHeader>
-          <CardTitle className="font-headline text-3xl">{editingProduct ? 'Edit Perfume' : 'Add New Perfume'}</CardTitle>
+          <CardTitle className="font-headline text-3xl">{editingProduct ? 'Edit Product' : 'Add New Product'}</CardTitle>
         </CardHeader>
         <CardContent>
           <Form {...form}>
@@ -183,7 +187,7 @@ export default function AdminPage() {
                   name="name"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Perfume Name</FormLabel>
+                      <FormLabel>Product Name</FormLabel>
                       <FormControl>
                         <Input placeholder="Elysian Bloom" {...field} />
                       </FormControl>
@@ -237,6 +241,42 @@ export default function AdminPage() {
                           <SelectItem value="Unisex">Unisex</SelectItem>
                         </SelectContent>
                       </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                 <FormField
+                  control={form.control}
+                  name="category"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Category</FormLabel>
+                      <Select onValueChange={field.onChange} value={field.value}>
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select a category" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          <SelectItem value="Perfume">Perfume</SelectItem>
+                          <SelectItem value="Oils">Oils</SelectItem>
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                 <FormField
+                  control={form.control}
+                  name="size"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Size</FormLabel>
+                      <FormControl>
+                        <Input placeholder="50ml or 200kg" {...field} />
+                      </FormControl>
                       <FormMessage />
                     </FormItem>
                   )}
@@ -333,7 +373,8 @@ export default function AdminPage() {
               <TableHeader>
                 <TableRow>
                   <TableHead>Name</TableHead>
-                  <TableHead>Brand</TableHead>
+                  <TableHead>Category</TableHead>
+                  <TableHead>Size</TableHead>
                   <TableHead>Price</TableHead>
                   <TableHead>Gender</TableHead>
                   <TableHead className="text-right">Actions</TableHead>
@@ -343,7 +384,8 @@ export default function AdminPage() {
                 {products.map((product) => (
                   <TableRow key={product.id}>
                     <TableCell className="font-medium">{product.name}</TableCell>
-                    <TableCell>{product.brand}</TableCell>
+                    <TableCell>{product.category}</TableCell>
+                    <TableCell>{product.size}</TableCell>
                     <TableCell>${product.price.toFixed(2)}</TableCell>
                     <TableCell>{product.gender}</TableCell>
                     <TableCell className="text-right space-x-2">

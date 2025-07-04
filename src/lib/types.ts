@@ -8,6 +8,8 @@ export interface Perfume {
   notes: string[];
   description: string;
   ingredients: string[];
+  category: 'Perfume' | 'Oils';
+  size: string;
 }
 
 export interface CartItem extends Perfume {

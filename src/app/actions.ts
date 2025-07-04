@@ -11,6 +11,8 @@ const ProductSchema = z.object({
   brand: z.string().min(1, "Brand is required"),
   price: z.coerce.number().min(0, "Price must be a positive number"),
   gender: z.enum(["Men", "Women", "Unisex"]),
+  category: z.enum(['Perfume', 'Oils']),
+  size: z.string().min(1, "Size is required (e.g. 50ml, 200kg)"),
   notes: z.string().min(1, "Notes are required"),
   description: z.string().min(1, "Description is required"),
   ingredients: z.string().min(1, "Ingredients are required"),

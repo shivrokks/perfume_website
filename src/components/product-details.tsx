@@ -38,6 +38,10 @@ export default function ProductDetails({ product }: ProductDetailsProps) {
         <div className="flex flex-col justify-center">
           <h1 className="font-headline text-4xl md:text-5xl font-bold">{product.name}</h1>
           <p className="text-xl text-muted-foreground mt-2">{product.brand}</p>
+          <div className="flex items-center gap-2 mt-4">
+              <Badge variant="outline" className="text-base font-medium">{product.category}</Badge>
+              <Badge variant="secondary" className="text-base font-medium">{product.size}</Badge>
+          </div>
           <p className="text-3xl font-semibold mt-6">${product.price.toFixed(2)}</p>
 
           <div className="mt-6 flex items-center gap-4">
