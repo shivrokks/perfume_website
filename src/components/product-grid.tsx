@@ -30,15 +30,14 @@ export default function ProductGrid({ allProducts }: ProductGridProps) {
     let products = [...allProducts];
 
     // Filter by category
-    if (categoryFilter !== 'All') {
-      if (categoryFilter === 'Perfume') {
-        // Legacy products without a category are considered Perfumes
-        products = products.filter(p => p.category === 'Perfume' || !p.category);
-      } else {
-        // For other categories, be strict
-        products = products.filter(p => p.category === categoryFilter);
-      }
+    if (categoryFilter === 'Perfume') {
+      // Show perfumes and legacy products (without a category)
+      products = products.filter(p => p.category === 'Perfume' || !p.category);
+    } else if (categoryFilter === 'Oils') {
+      // Show only oils
+      products = products.filter(p => p.category === 'Oils');
     }
+    // If 'All', do no category filtering.
 
     // Filter by gender
     if (genderFilter !== 'All') {
