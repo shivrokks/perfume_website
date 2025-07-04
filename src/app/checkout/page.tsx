@@ -1,3 +1,4 @@
+
 "use client";
 
 import React, { useEffect, useState } from 'react';
@@ -193,21 +194,27 @@ export default function CheckoutPage() {
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
-                {cartItems.map(item => (
-                  <div key={item.id} className="flex items-center gap-4">
-                    <div className="relative h-16 w-16 rounded-md border overflow-hidden">
-                       <Image src={item.image} alt={item.name} layout="fill" objectFit="cover" data-ai-hint="perfume bottle" />
-                       <div className="absolute top-0 right-0 bg-secondary text-secondary-foreground text-xs rounded-bl-md px-1.5 py-0.5">
-                         {item.quantity}
-                       </div>
+                {cartItems.map(item => {
+                  const isOil = item.category === 'Oils';
+                  const displayQuantity = isOil ? `${item.quantity}ml` : item.quantity;
+                  const itemTotal = isOil ? (item.price / 100) * item.quantity : item.price * item.quantity;
+
+                  return (
+                    <div key={item.id} className="flex items-center gap-4">
+                      <div className="relative h-16 w-16 rounded-md border overflow-hidden">
+                         <Image src={item.image} alt={item.name} layout="fill" objectFit="cover" data-ai-hint="perfume bottle" />
+                         <div className="absolute top-0 right-0 bg-secondary text-secondary-foreground text-xs rounded-bl-md px-1.5 py-0.5">
+                           {displayQuantity}
+                         </div>
+                      </div>
+                      <div className="flex-1">
+                        <p className="font-semibold">{item.name}</p>
+                        <p className="text-sm text-muted-foreground">{item.brand}</p>
+                      </div>
+                      <p className="font-medium">${itemTotal.toFixed(2)}</p>
                     </div>
-                    <div className="flex-1">
-                      <p className="font-semibold">{item.name}</p>
-                      <p className="text-sm text-muted-foreground">{item.brand}</p>
-                    </div>
-                    <p className="font-medium">${(item.price * item.quantity).toFixed(2)}</p>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
               <Separator className="my-6" />
               <div className="space-y-2">

@@ -1,3 +1,4 @@
+
 "use server";
 
 import { z } from "zod";
@@ -12,12 +13,21 @@ const ProductSchema = z.object({
   price: z.coerce.number().min(0, "Price must be a positive number"),
   gender: z.enum(["Men", "Women", "Unisex"]),
   category: z.enum(['Perfume', 'Oils']),
-  size: z.string().min(1, "Size is required (e.g. 50ml, 200kg)"),
+  size: z.string().optional(),
   notes: z.string().min(1, "Notes are required"),
   description: z.string().min(1, "Description is required"),
   ingredients: z.string().min(1, "Ingredients are required"),
   image: z.string().url("Must be a valid placeholder URL").optional(),
+}).superRefine((data, ctx) => {
+  if (data.category === 'Perfume' && (!data.size || data.size.trim() === '')) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      path: ['size'],
+      message: 'Size is required for perfumes (e.g., 50ml).',
+    });
+  }
 });
+
 
 export async function addProduct(formData: FormData) {
   const values = Object.fromEntries(formData.entries());

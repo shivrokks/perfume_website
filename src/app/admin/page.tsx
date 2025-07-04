@@ -1,3 +1,4 @@
+
 // @ts-nocheck
 "use client";
 
@@ -28,11 +29,19 @@ const ProductSchema = z.object({
   price: z.coerce.number().min(0, "Price must be a positive number"),
   gender: z.enum(["Men", "Women", "Unisex"]),
   category: z.enum(['Perfume', 'Oils']),
-  size: z.string().min(1, "Size is required (e.g. 50ml, 200kg)"),
+  size: z.string().optional(),
   notes: z.string().min(1, "Provide comma-separated notes"),
   description: z.string().min(1, "Description is required"),
   ingredients: z.string().min(1, "Provide comma-separated ingredients"),
   image: z.string().url("Must be a valid placeholder URL").optional().or(z.literal('')),
+}).superRefine((data, ctx) => {
+  if (data.category === 'Perfume' && (!data.size || data.size.trim() === '')) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      path: ['size'],
+      message: 'Size is required for perfumes (e.g., 50ml).',
+    });
+  }
 });
 
 const defaultFormValues = {
@@ -63,6 +72,8 @@ export default function AdminPage() {
     resolver: zodResolver(ProductSchema),
     defaultValues: defaultFormValues,
   });
+  
+  const category = form.watch('category');
 
   const { isSubmitting } = useFormState({ control: form.control });
 
@@ -209,44 +220,8 @@ export default function AdminPage() {
                   )}
                 />
               </div>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                <FormField
-                  control={form.control}
-                  name="price"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Price</FormLabel>
-                      <FormControl>
-                        <Input type="number" placeholder="180" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="gender"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Gender</FormLabel>
-                      <Select onValueChange={field.onChange} value={field.value}>
-                        <FormControl>
-                          <SelectTrigger>
-                            <SelectValue placeholder="Select a gender" />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          <SelectItem value="Men">Men</SelectItem>
-                          <SelectItem value="Women">Women</SelectItem>
-                          <SelectItem value="Unisex">Unisex</SelectItem>
-                        </SelectContent>
-                      </Select>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </div>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+
+               <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                  <FormField
                   control={form.control}
                   name="category"
@@ -268,19 +243,59 @@ export default function AdminPage() {
                     </FormItem>
                   )}
                 />
-                 <FormField
+                <FormField
                   control={form.control}
-                  name="size"
+                  name="price"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Size</FormLabel>
+                      <FormLabel>{category === 'Oils' ? 'Price per 100ml' : 'Price'}</FormLabel>
                       <FormControl>
-                        <Input placeholder="50ml or 200kg" {...field} />
+                        <Input type="number" placeholder="180" {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
                   )}
                 />
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                 <FormField
+                  control={form.control}
+                  name="gender"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Gender</FormLabel>
+                      <Select onValueChange={field.onChange} value={field.value}>
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select a gender" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          <SelectItem value="Men">Men</SelectItem>
+                          <SelectItem value="Women">Women</SelectItem>
+                          <SelectItem value="Unisex">Unisex</SelectItem>
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                 {category === 'Perfume' && (
+                   <FormField
+                    control={form.control}
+                    name="size"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Size</FormLabel>
+                        <FormControl>
+                          <Input placeholder="50ml" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                 )}
               </div>
               <FormField
                 control={form.control}
@@ -385,8 +400,8 @@ export default function AdminPage() {
                   <TableRow key={product.id}>
                     <TableCell className="font-medium">{product.name}</TableCell>
                     <TableCell>{product.category}</TableCell>
-                    <TableCell>{product.size}</TableCell>
-                    <TableCell>${product.price.toFixed(2)}</TableCell>
+                    <TableCell>{product.category === 'Oils' ? '-' : product.size}</TableCell>
+                    <TableCell>${product.price.toFixed(2)}{product.category === 'Oils' ? '/100ml' : ''}</TableCell>
                     <TableCell>{product.gender}</TableCell>
                     <TableCell className="text-right space-x-2">
                       <Button variant="outline" size="sm" onClick={() => handleEditClick(product)}>

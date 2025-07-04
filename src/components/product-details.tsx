@@ -1,6 +1,7 @@
+
 "use client";
 
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import type { Perfume } from '@/lib/types';
 import Image from 'next/image';
 import { Button } from '@/components/ui/button';
@@ -8,6 +9,8 @@ import { useCart } from '@/hooks/use-cart';
 import { Badge } from './ui/badge';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from './ui/accordion';
 import { Heart } from 'lucide-react';
+import { Input } from './ui/input';
+import { Label } from './ui/label';
 
 interface ProductDetailsProps {
   product: Perfume;
@@ -15,13 +18,21 @@ interface ProductDetailsProps {
 
 export default function ProductDetails({ product }: ProductDetailsProps) {
   const { addToCart } = useCart();
+  const [oilQuantity, setOilQuantity] = useState(100);
+
+  const isOil = product.category === 'Oils';
+  const oilTotalPrice = isOil ? (product.price / 100) * oilQuantity : 0;
 
   useEffect(() => {
-    // Add to viewing history for personalization
     const history = JSON.parse(localStorage.getItem('viewingHistory') || '[]');
     const newHistory = [product.name, ...history.filter((p: string) => p !== product.name)].slice(0, 10);
     localStorage.setItem('viewingHistory', JSON.stringify(newHistory));
   }, [product.name]);
+
+  const handleAddToCart = () => {
+    const quantityToAdd = isOil ? oilQuantity : 1;
+    addToCart(product, quantityToAdd);
+  };
 
   return (
     <div className="container mx-auto max-w-5xl py-12 px-4 sm:px-6 lg:px-8">
@@ -40,12 +51,34 @@ export default function ProductDetails({ product }: ProductDetailsProps) {
           <p className="text-xl text-muted-foreground mt-2">{product.brand}</p>
           <div className="flex items-center gap-2 mt-4">
               <Badge variant="outline" className="text-base font-medium">{product.category}</Badge>
-              <Badge variant="secondary" className="text-base font-medium">{product.size}</Badge>
+              {!isOil && <Badge variant="secondary" className="text-base font-medium">{product.size}</Badge>}
           </div>
-          <p className="text-3xl font-semibold mt-6">${product.price.toFixed(2)}</p>
+          
+          {isOil ? (
+            <div className="mt-6">
+              <p className="text-3xl font-semibold">${product.price.toFixed(2)} <span className="text-lg text-muted-foreground">/ 100ml</span></p>
+              <div className="grid w-full max-w-sm items-center gap-2 mt-4">
+                <Label htmlFor="quantity">Quantity (ml)</Label>
+                <div className="flex items-center gap-2">
+                  <Input 
+                    id="quantity" 
+                    type="number" 
+                    value={oilQuantity}
+                    onChange={(e) => setOilQuantity(Math.max(0, parseInt(e.target.value) || 0))}
+                    min="0"
+                    step="50"
+                    className="w-32"
+                  />
+                  <p className="text-2xl font-semibold">= ${oilTotalPrice.toFixed(2)}</p>
+                </div>
+              </div>
+            </div>
+          ) : (
+            <p className="text-3xl font-semibold mt-6">${product.price.toFixed(2)}</p>
+          )}
 
           <div className="mt-6 flex items-center gap-4">
-            <Button size="lg" onClick={() => addToCart(product)} className="flex-grow">
+            <Button size="lg" onClick={handleAddToCart} className="flex-grow" disabled={isOil && oilQuantity <= 0}>
               Add to Cart
             </Button>
             <Button variant="outline" size="icon" aria-label="Add to wishlist">

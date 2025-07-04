@@ -1,3 +1,4 @@
+
 "use client";
 
 import Link from 'next/link';
@@ -24,6 +25,7 @@ const cardVariants = {
 export default function PerfumeCard({ perfume }: PerfumeCardProps) {
   const { cartItems, addToCart, updateQuantity } = useCart();
   const itemInCart = cartItems.find((item) => item.id === perfume.id);
+  const isOil = perfume.category === 'Oils';
 
   return (
     <motion.div variants={cardVariants} className="h-full">
@@ -52,12 +54,16 @@ export default function PerfumeCard({ perfume }: PerfumeCardProps) {
             <p className="text-sm text-muted-foreground">{perfume.brand}</p>
           </div>
           <div className="flex justify-between items-center mt-2">
-            <p className="font-semibold">${perfume.price.toFixed(2)}</p>
+            <p className="font-semibold">${perfume.price.toFixed(2)}{isOil ? '/100ml' : ''}</p>
             <p className="text-sm text-muted-foreground">{perfume.size}</p>
           </div>
         </CardContent>
         <CardFooter className="p-4 pt-0">
-          {itemInCart ? (
+          {isOil ? (
+            <Button asChild className="w-full">
+              <Link href={`/products/${perfume.id}`}>Select Amount</Link>
+            </Button>
+          ) : itemInCart ? (
             <div className="flex w-full items-center justify-center gap-2">
               <Button
                 variant="outline"
