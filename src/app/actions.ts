@@ -1,4 +1,3 @@
-
 "use server";
 
 import { z } from "zod";
@@ -49,7 +48,7 @@ async function uploadImage(file: File): Promise<string> {
 
 export async function addProduct(formData: FormData) {
   const values = Object.fromEntries(formData.entries());
-  const imageFile = values.image as File;
+  const imageFile = formData.get('image') as File;
 
   const parsed = ProductFormSchema.safeParse(values);
 
@@ -100,7 +99,7 @@ export async function addProduct(formData: FormData) {
 
 export async function updateProduct(id: string, formData: FormData) {
   const values = Object.fromEntries(formData.entries());
-  const imageFile = values.image as File;
+  const imageFile = formData.get('image') as File;
   const existingImageUrl = values.image_url as string;
 
   const parsed = ProductFormSchema.safeParse(values);
