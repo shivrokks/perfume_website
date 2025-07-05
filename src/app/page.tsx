@@ -11,29 +11,50 @@ export default async function Home() {
   return (
     <div className="flex flex-col">
       {/* Hero Section */}
-      <section className="relative h-[75vh] bg-cover bg-center text-white" style={{ backgroundImage: "url('https://placehold.co/1600x900.png')" }}>
-         <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
-        <div className="relative z-10 flex h-full flex-col items-center justify-end pb-20 text-center">
-          <h1 className="font-headline text-5xl font-bold md:text-7xl">
-            The Essence of Elegance
+      <section className="relative flex h-[60vh] items-center justify-center bg-background text-center text-foreground">
+        <div>
+          <h1 className="font-headline text-7xl font-bold tracking-tighter md:text-9xl">
+            LORVÉ
           </h1>
-          <p className="mt-4 max-w-2xl text-lg">
-            Experience the art of fine perfumery. Discover scents that define you.
+          <p className="mt-4 font-headline text-xl uppercase tracking-[0.4em] text-muted-foreground md:text-2xl">
+            Reign with Aura
           </p>
-          <Button asChild size="lg" className="mt-8">
-            <Link href="/products">Explore the Collection</Link>
-          </Button>
+        </div>
+      </section>
+
+      {/* Brand Story Section */}
+      <section className="bg-background py-16 sm:py-24">
+        <div className="container mx-auto max-w-4xl text-center">
+          <p className="text-xl leading-relaxed text-foreground/80 md:text-2xl">
+            Lorvè is a fragrance house rooted in India's rich perfumery
+            heritage, blending the timeless art of traditional scent-making with
+            modern luxury and elegance. Every bottle is a heartfelt
+            expression—crafted with pride, purity, and purpose—to turn dreams
+            into lasting experiences, built on trust and soul.
+          </p>
+          <div className="mt-12">
+            <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2 font-headline tracking-widest text-foreground/60">
+              <span>PRIDE</span>
+              <span>PURITY</span>
+              <span>HONESTY</span>
+              <span>SOUL</span>
+              <span>HERITAGE</span>
+              <span>ELEGANCE</span>
+            </div>
+          </div>
         </div>
       </section>
 
       {/* Featured Products Section */}
-      <section className="bg-background py-16 sm:py-24">
+      <section className="bg-secondary py-16 sm:py-24">
         <div className="container mx-auto">
-          <div className="text-center mb-12">
+          <div className="mb-12 text-center">
             <h2 className="font-headline text-3xl font-bold md:text-4xl">
               Featured Products
             </h2>
-             <p className="text-muted-foreground mt-2 text-lg">Handpicked for an unforgettable experience.</p>
+            <p className="mt-2 text-lg text-muted-foreground">
+              Handpicked for an unforgettable experience.
+            </p>
           </div>
           {featuredProducts.length > 0 ? (
             <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-4">
@@ -41,9 +62,11 @@ export default async function Home() {
                 <PerfumeCard key={product.id} perfume={product} />
               ))}
             </div>
-           ) : (
-             <p className="text-center text-muted-foreground">Our collection will appear here soon.</p>
-           )}
+          ) : (
+            <p className="text-center text-muted-foreground">
+              Our collection will appear here soon.
+            </p>
+          )}
         </div>
       </section>
     </div>
