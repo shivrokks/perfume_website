@@ -10,41 +10,41 @@ export default async function Home() {
 
   return (
     <div className="flex flex-col">
-      {/* Combined Hero and Story Section */}
-      <section className="bg-background py-24 sm:py-32">
+      {/* Combined Hero and Story Section with Mughal Pattern */}
+      <section className="bg-mughal-pattern py-24 sm:py-32">
         <div className="container mx-auto max-w-4xl text-center">
-          
-          {/* Hero Part */}
-          <div>
-            <h1 className="font-headline text-5xl font-bold tracking-tighter md:text-7xl">
-              LORVÉ
-            </h1>
-            <p className="mt-4 font-headline text-lg uppercase tracking-[0.3em] text-muted-foreground md:text-xl">
-              Reign with Aura
-            </p>
-          </div>
+          <div className="bg-background/80 backdrop-blur-sm p-8 md:p-12 rounded-lg shadow-lg">
+            {/* Hero Part */}
+            <div>
+              <h1 className="font-headline text-5xl font-bold tracking-tighter md:text-7xl">
+                LORVÉ
+              </h1>
+              <p className="mt-4 font-headline text-lg uppercase tracking-[0.3em] text-muted-foreground md:text-xl">
+                Reign with Aura
+              </p>
+            </div>
 
-          {/* Story Part */}
-          <div className="mt-20">
-            <p className="text-xl leading-relaxed text-foreground/80 md:text-2xl">
-              Lorvè is a fragrance house rooted in India's rich perfumery
-              heritage, blending the timeless art of traditional scent-making with
-              modern luxury and elegance. Every bottle is a heartfelt
-              expression—crafted with pride, purity, and purpose—to turn dreams
-              into lasting experiences, built on trust and soul.
-            </p>
-            <div className="mt-12">
-              <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2 font-headline tracking-widest text-foreground/60">
-                <span>PRIDE</span>
-                <span>PURITY</span>
-                <span>HONESTY</span>
-                <span>SOUL</span>
-                <span>HERITAGE</span>
-                <span>ELEGANCE</span>
+            {/* Story Part */}
+            <div className="mt-12 md:mt-16">
+              <p className="text-xl leading-relaxed text-foreground/80 md:text-2xl">
+                Lorvè is a fragrance house rooted in India's rich perfumery
+                heritage, blending the timeless art of traditional scent-making with
+                modern luxury and elegance. Every bottle is a heartfelt
+                expression—crafted with pride, purity, and purpose—to turn dreams
+                into lasting experiences, built on trust and soul.
+              </p>
+              <div className="mt-12">
+                <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2 font-headline tracking-widest text-foreground/60">
+                  <span>PRIDE</span>
+                  <span>PURITY</span>
+                  <span>HONESTY</span>
+                  <span>SOUL</span>
+                  <span>HERITAGE</span>
+                  <span>ELEGANCE</span>
+                </div>
               </div>
             </div>
           </div>
-        
         </div>
       </section>
 
