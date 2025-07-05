@@ -11,12 +11,12 @@ export default async function Home() {
   return (
     <div className="flex flex-col">
       {/* Hero Section */}
-      <section className="relative flex h-[60vh] items-center justify-center bg-background text-center text-foreground">
+      <section className="relative flex h-[50vh] items-center justify-center bg-background text-center text-foreground">
         <div>
-          <h1 className="font-headline text-7xl font-bold tracking-tighter md:text-9xl">
+          <h1 className="font-headline text-5xl font-bold tracking-tighter md:text-7xl">
             LORVÉ
           </h1>
-          <p className="mt-4 font-headline text-xl uppercase tracking-[0.4em] text-muted-foreground md:text-2xl">
+          <p className="mt-4 font-headline text-lg uppercase tracking-[0.3em] text-muted-foreground md:text-xl">
             Reign with Aura
           </p>
         </div>
