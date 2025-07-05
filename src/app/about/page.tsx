@@ -29,7 +29,7 @@ export default function AboutPage() {
                 alt="Artisan perfumery workshop"
                 layout="fill"
                 objectFit="cover"
-                data-ai-hint="artisan perfumery"
+                data-ai-hint="mughal garden"
               />
             </div>
           </div>
@@ -43,7 +43,7 @@ export default function AboutPage() {
                 alt="Rare botanical perfume ingredients"
                 layout="fill"
                 objectFit="cover"
-                data-ai-hint="rare botanicals"
+                data-ai-hint="indian spices"
               />
             </div>
             <div className="md:order-1">

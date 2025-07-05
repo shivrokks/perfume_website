@@ -17,8 +17,8 @@ export default {
     },
     extend: {
       fontFamily: {
-        body: ['"PT Sans"', 'sans-serif'],
-        headline: ['"Playfair Display"', 'serif'],
+        body: ['"Lora"', 'serif'],
+        headline: ['"Cinzel"', 'serif'],
       },
       colors: {
         background: 'hsl(var(--background))',

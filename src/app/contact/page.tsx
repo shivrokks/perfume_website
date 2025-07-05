@@ -114,7 +114,7 @@ export default function ContactPage() {
                 alt="Map to LORVÉ boutique"
                 layout="fill"
                 objectFit="cover"
-                data-ai-hint="city map"
+                data-ai-hint="mughal architecture"
               />
             </div>
         </div>
