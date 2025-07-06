@@ -30,6 +30,11 @@ const ProductFormSchema = z.object({
 });
 
 async function uploadImage(file: File): Promise<string> {
+  // Explicitly check for environment variables
+  if (!process.env.CLOUDINARY_CLOUD_NAME || !process.env.CLOUDINARY_API_KEY || !process.env.CLOUDINARY_API_SECRET) {
+    throw new Error("Cloudinary API credentials are not configured on the server. Please set them in your environment variables.");
+  }
+
   if (!file || typeof file.arrayBuffer !== 'function') {
       console.error('UploadImage Error: Invalid file object received.', file);
       throw new Error('Invalid file was provided for upload.');

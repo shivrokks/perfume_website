@@ -23,7 +23,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import { Loader2, Terminal } from 'lucide-react';
+import { Loader2, Terminal, ShieldAlert } from 'lucide-react';
 
 const ProductSchema = z.object({
   name: z.string().min(1, "Name is required"),
@@ -70,6 +70,7 @@ export default function AdminPage() {
   const [productToDelete, setProductToDelete] = useState<Perfume | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const [formError, setFormError] = useState<string | null>(null);
 
   const form = useForm<z.infer<typeof ProductSchema>>({
     resolver: zodResolver(ProductSchema),
@@ -106,6 +107,7 @@ export default function AdminPage() {
 
   const handleEditClick = (product: Perfume) => {
     setEditingProduct(product);
+    setFormError(null);
     setImagePreview(product.image); // Set current image for preview
     form.reset({
       ...product,
@@ -120,6 +122,7 @@ export default function AdminPage() {
   const handleCancelEdit = () => {
     setEditingProduct(null);
     setImagePreview(null);
+    setFormError(null);
     form.reset(defaultFormValues);
   };
   
@@ -149,6 +152,8 @@ export default function AdminPage() {
   };
 
   async function onSubmit(values: z.infer<typeof ProductSchema>) {
+    setFormError(null); // Reset error on new submission
+
     const formData = new FormData();
 
     // Handle image separately
@@ -181,6 +186,7 @@ export default function AdminPage() {
       fetchProducts(); // Refresh the list
     } else {
         const errorMsg = result.error?._global?.[0] || "An unknown error occurred.";
+        setFormError(errorMsg);
         toast({
             variant: 'destructive',
             title: 'Error',
@@ -217,6 +223,13 @@ export default function AdminPage() {
           <CardTitle className="font-headline text-3xl">{editingProduct ? 'Edit Product' : 'Add New Product'}</CardTitle>
         </CardHeader>
         <CardContent>
+          {formError && (
+            <Alert variant="destructive" className="mb-6">
+              <ShieldAlert className="h-4 w-4" />
+              <AlertTitle>Action Failed</AlertTitle>
+              <AlertDescription>{formError}</AlertDescription>
+            </Alert>
+          )}
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
