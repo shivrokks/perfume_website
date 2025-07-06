@@ -42,9 +42,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   const sendSignUpLink = (email: string) => {
     const actionCodeSettings = {
-      // Use the current URL to handle the sign-in completion.
-      // This works for both local development and deployed environments.
-      url: window.location.href,
+      // Use the origin and specifically point to the signup page.
+      // This is more robust than using the full, potentially dynamic, window.location.href.
+      url: `${window.location.origin}/signup`,
       handleCodeInApp: true,
     };
     window.localStorage.setItem('emailForSignIn', email);
