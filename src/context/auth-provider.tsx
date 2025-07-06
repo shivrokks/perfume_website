@@ -41,10 +41,12 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   }
 
   const sendSignUpLink = (email: string) => {
+    const url = `${window.location.origin}/signup`;
+    // This log is crucial for debugging.
+    console.log(`Firebase Auth: Preparing sign-up link for URL: ${url}. Ensure the domain from this URL is in your Firebase project's 'Authorized domains' list.`);
+
     const actionCodeSettings = {
-      // Use the origin and specifically point to the signup page.
-      // This is more robust than using the full, potentially dynamic, window.location.href.
-      url: `${window.location.origin}/signup`,
+      url: url,
       handleCodeInApp: true,
     };
     window.localStorage.setItem('emailForSignIn', email);

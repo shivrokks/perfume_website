@@ -112,6 +112,7 @@ export default function SignupPage() {
       setEmail(values.email);
       setStep('linkSent');
     } catch (error: any) {
+      console.error("Firebase sign-up error:", error);
       toast({
         variant: "destructive",
         title: "Sign-up Failed",
