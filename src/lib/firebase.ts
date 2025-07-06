@@ -10,8 +10,8 @@ const firebaseConfig = {
   projectId: "lorv-ybzjd",
   storageBucket: "lorv-ybzjd.firebasestorage.app",
   messagingSenderId: "226679573057",
-  appId: "1:226679573057:web:bb93d2b5f45312572214c0"
-  // measurementId: "G-XXXXXXXXXX" // Optional: Enable Analytics in Firebase to get this ID
+  appId: "1:226679573057:web:bb93d2b5f45312572214c0",
+  measurementId: "G-0VQBD8TTDW"
 };
 
 // Initialize Firebase
