@@ -23,8 +23,7 @@ const fromFirestore = (doc): Perfume => {
 export const getProducts = async (): Promise<Perfume[]> => {
   try {
     const productsCollection = collection(firestore, 'products');
-    const q = query(productsCollection, orderBy('createdAt', 'desc'));
-    const productSnapshot = await getDocs(q);
+    const productSnapshot = await getDocs(productsCollection);
     return productSnapshot.docs.map(fromFirestore);
   } catch (error) {
     console.error("Error fetching products:", error);
