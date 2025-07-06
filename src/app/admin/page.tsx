@@ -212,9 +212,12 @@ export default function AdminPage() {
     <div className="container mx-auto py-12 space-y-12">
       <Alert>
         <Terminal className="h-4 w-4" />
-        <AlertTitle>Admin Status</AlertTitle>
+        <AlertTitle>Admin Status Debug</AlertTitle>
         <AlertDescription>
-          You are logged in as <span className="font-semibold">{user?.email}</span>. Make sure this email has write permissions in your Firestore rules.
+          <p>Logged in as: <span className="font-semibold">{user?.email}</span></p>
+          <p>Required Admin Email: <span className="font-semibold">shivansh121shukla@gmail.com</span></p>
+          <p>Is Admin? <span className="font-semibold">{isAdmin ? 'Yes' : 'No'}</span></p>
+          <p className="mt-2">If "Is Admin?" is No, there is a mismatch. If Yes, and you still see permission errors, the issue is with the server environment's authentication.</p>
         </AlertDescription>
       </Alert>
 
