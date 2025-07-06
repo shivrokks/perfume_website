@@ -1,17 +1,17 @@
+
 import { initializeApp, getApps, getApp } from "firebase/app";
 import { getAuth } from "firebase/auth";
 import { getFirestore } from "firebase/firestore";
 
-// This configuration MUST point to the Firebase project where your data is stored.
-// You mentioned this is `lorve-40696`.
+// TODO: Replace with your app's Firebase project configuration
 const firebaseConfig = {
-  apiKey: "AIzaSyBdKHDgIi9A8Q_NFLRApvqVi3G64wmdDZA",
-  authDomain: "lorve-40696.firebaseapp.com",
-  projectId: "lorve-40696",
-  storageBucket: "lorve-40696.firebasestorage.app",
-  messagingSenderId: "724317316722",
-  appId: "1:724317316722:web:c19d294e6020f9c372c4eb",
-  measurementId: "G-SMGX763Z6J"
+  apiKey: "YOUR_API_KEY",
+  authDomain: "YOUR_AUTH_DOMAIN",
+  projectId: "YOUR_PROJECT_ID",
+  storageBucket: "YOUR_STORAGE_BUCKET",
+  messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
+  appId: "YOUR_APP_ID",
+  measurementId: "YOUR_MEASUREMENT_ID"
 };
 
 // Initialize Firebase
