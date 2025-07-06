@@ -22,7 +22,8 @@ import { useToast } from '@/hooks/use-toast';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
-import { Loader2 } from 'lucide-react';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { Loader2, Terminal } from 'lucide-react';
 
 const ProductSchema = z.object({
   name: z.string().min(1, "Name is required"),
@@ -203,6 +204,14 @@ export default function AdminPage() {
   return (
     <>
     <div className="container mx-auto py-12 space-y-12">
+      <Alert>
+        <Terminal className="h-4 w-4" />
+        <AlertTitle>Admin Status</AlertTitle>
+        <AlertDescription>
+          You are logged in as <span className="font-semibold">{user?.email}</span>. Make sure this email has write permissions in your Firestore rules.
+        </AlertDescription>
+      </Alert>
+
       <Card className="max-w-4xl mx-auto">
         <CardHeader>
           <CardTitle className="font-headline text-3xl">{editingProduct ? 'Edit Product' : 'Add New Product'}</CardTitle>
