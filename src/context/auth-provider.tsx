@@ -42,10 +42,10 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   const sendSignUpLink = (email: string) => {
     const actionCodeSettings = {
-      url: `${window.location.origin}/signup`,
+      // Hardcoding the URL to match the authorized domain in Firebase.
+      url: 'https://studio--lorv-ybzjd.us-central1.hosted.app/signup',
       handleCodeInApp: true,
     };
-    console.log('Firebase Auth: The domain that needs to be authorized is based on this URL:', window.location.origin);
     window.localStorage.setItem('emailForSignIn', email);
     return sendSignInLinkToEmail(auth, email, actionCodeSettings);
   };
