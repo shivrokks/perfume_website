@@ -31,7 +31,8 @@ const getAuthErrorDescription = (error: any) => {
         case 'auth/invalid-api-key':
             return "Your Firebase configuration is invalid. Please check your environment variables.";
         case 'auth/unauthorized-continue-uri':
-            return "This domain is not authorized for sign-up operations. Please add this app's domain to the 'Authorized domains' list in your Firebase Authentication settings.";
+            const origin = typeof window !== 'undefined' ? window.location.origin : 'your-app-domain.com';
+            return `This domain (${origin}) is not authorized for sign-up operations. Please add this exact domain to the 'Authorized domains' list in your Firebase Authentication settings.`;
         case 'auth/invalid-action-code':
             return "The verification link is invalid or has expired. Please try signing up again.";
         case 'auth/expired-action-code':
