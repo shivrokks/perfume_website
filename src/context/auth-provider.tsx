@@ -11,9 +11,9 @@ interface AuthContextType {
   isAdmin: boolean;
   loading: boolean;
   signInWithEmail: (email, password) => Promise<any>;
-  sendSignUpLink: (email) => Promise<void>;
-  completeSignUp: (email, link) => Promise<any>;
-  updateUserPassword: (password) => Promise<void>;
+  sendSignUpLink: (email: string) => Promise<void>;
+  completeSignUp: (email: string, link: string) => Promise<any>;
+  updateUserPassword: (password: string) => Promise<void>;
   signOut: () => Promise<void>;
 }
 
@@ -42,8 +42,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   const sendSignUpLink = (email: string) => {
     const actionCodeSettings = {
-      // Hardcoding the URL to match the authorized domain in Firebase.
-      url: 'https://studio--lorv-ybzjd.us-central1.hosted.app/signup',
+      // Use the current URL to handle the sign-in completion.
+      // This works for both local development and deployed environments.
+      url: window.location.href,
       handleCodeInApp: true,
     };
     window.localStorage.setItem('emailForSignIn', email);
