@@ -108,6 +108,9 @@ export default function SignupPage() {
 
   const handleEmailSubmit = async (values: z.infer<typeof emailSchema>) => {
     setIsLoading(true);
+    const url = `${window.location.origin}/signup`;
+    console.log(`Firebase Auth: The app is running on domain '${window.location.origin}'. Attempting to send a sign-up link that will redirect back to '${url}'. Please ensure '${window.location.origin}' is in your Firebase project's 'Authorized domains' list.`);
+
     try {
       await sendSignUpLink(values.email);
       setEmail(values.email);
