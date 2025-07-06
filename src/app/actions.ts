@@ -244,11 +244,15 @@ export async function upsertUserAddress(userId: string, address: Address) {
     revalidatePath('/billing');
 
     return { success: true };
-  } catch (error) {
+  } catch (error: any) {
     console.error("Error saving address:", error);
+    let errorMessage = "Failed to save address.";
+    if (error.code === 'permission-denied') {
+      errorMessage = "Permission denied. Please check your Firestore security rules to ensure you can write to your own user document.";
+    }
     return {
       success: false,
-      error: "Failed to save address."
+      error: errorMessage
     };
   }
 }
