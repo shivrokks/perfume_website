@@ -135,10 +135,11 @@ export default function AdminPage() {
       });
       fetchProducts(); // Refresh the list
     } else {
+      const errorMsg = result.error?._global?.[0] || 'Failed to delete product.';
       toast({
         variant: 'destructive',
         title: 'Error',
-        description: result.error || 'Failed to delete product.',
+        description: errorMsg,
       });
     }
     
