@@ -3,15 +3,15 @@ import { initializeApp, getApps, getApp } from "firebase/app";
 import { getAuth } from "firebase/auth";
 import { getFirestore } from "firebase/firestore";
 
-// TODO: Replace with your app's Firebase project configuration
+// Your Firebase project configuration
 const firebaseConfig = {
-  apiKey: "YOUR_API_KEY",
-  authDomain: "YOUR_AUTH_DOMAIN",
-  projectId: "YOUR_PROJECT_ID",
-  storageBucket: "YOUR_STORAGE_BUCKET",
-  messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
-  appId: "YOUR_APP_ID",
-  measurementId: "YOUR_MEASUREMENT_ID"
+  apiKey: "AIzaSyCbBD5WPnUToBknA0vA1w72JQk9e0WU4dU",
+  authDomain: "lorv-ybzjd.firebaseapp.com",
+  projectId: "lorv-ybzjd",
+  storageBucket: "lorv-ybzjd.firebasestorage.app",
+  messagingSenderId: "226679573057",
+  appId: "1:226679573057:web:bb93d2b5f45312572214c0"
+  // measurementId: "G-XXXXXXXXXX" // Optional: Enable Analytics in Firebase to get this ID
 };
 
 // Initialize Firebase
