@@ -118,10 +118,7 @@ export async function addProduct(formData: FormData) {
     return { success: true };
   } catch (error: any) {
     console.error("Error adding document: ", error);
-    let errorMessage = "Failed to add product to the database.";
-    if (error.code === 'permission-denied') {
-        errorMessage = "Permission denied. Ensure your account has admin rights and Firestore security rules are configured to allow writes.";
-    }
+    const errorMessage = error.message || "An unexpected error occurred while adding the product.";
     return {
       success: false,
       error: { _global: [errorMessage] },
@@ -187,10 +184,7 @@ export async function updateProduct(id: string, formData: FormData) {
     return { success: true };
   } catch (error: any) {
     console.error("Error updating document: ", error);
-    let errorMessage = "Failed to update product in the database.";
-     if (error.code === 'permission-denied') {
-        errorMessage = "Permission denied. Ensure your account has admin rights and Firestore security rules are configured to allow writes.";
-    }
+    const errorMessage = error.message || "An unexpected error occurred while updating the product.";
     return {
       success: false,
       error: { _global: [errorMessage] },
@@ -210,10 +204,7 @@ export async function deleteProduct(id: string) {
     return { success: true };
   } catch (error: any) {
     console.error("Error deleting document: ", error);
-    let errorMessage = "Failed to delete product from the database.";
-    if (error.code === 'permission-denied') {
-        errorMessage = "Permission denied. Ensure your account has admin rights and Firestore security rules are configured to allow writes.";
-    }
+    const errorMessage = error.message || "An unexpected error occurred while deleting the product.";
     return {
       success: false,
       error: { _global: [errorMessage] },
@@ -251,10 +242,7 @@ export async function upsertUserAddress(userId: string, address: Address) {
     return { success: true };
   } catch (error: any) {
     console.error("Error saving address:", error);
-    let errorMessage = "Failed to save address.";
-    if (error.code === 'permission-denied') {
-      errorMessage = "Permission denied. Please check your Firestore security rules to ensure you can write to your own user document.";
-    }
+    const errorMessage = error.message || "Failed to save address.";
     return {
       success: false,
       error: errorMessage

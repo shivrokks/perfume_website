@@ -189,7 +189,7 @@ export default function AdminPage() {
         setFormError(errorMsg);
         toast({
             variant: 'destructive',
-            title: 'Error',
+            title: 'Action Failed',
             description: errorMsg,
         });
     }
@@ -210,17 +210,6 @@ export default function AdminPage() {
   return (
     <>
     <div className="container mx-auto py-12 space-y-12">
-      <Alert>
-        <Terminal className="h-4 w-4" />
-        <AlertTitle>Admin Status Debug</AlertTitle>
-        <AlertDescription>
-          <p>Logged in as: <span className="font-semibold">{user?.email}</span></p>
-          <p>Required Admin Email: <span className="font-semibold">shivansh121shukla@gmail.com</span></p>
-          <p>Is Admin? <span className="font-semibold">{isAdmin ? 'Yes' : 'No'}</span></p>
-          <p className="mt-2">If "Is Admin?" is No, there is a mismatch. If Yes, and you still see permission errors, the issue is with the server environment's authentication.</p>
-        </AlertDescription>
-      </Alert>
-
       <Card className="max-w-4xl mx-auto">
         <CardHeader>
           <CardTitle className="font-headline text-3xl">{editingProduct ? 'Edit Product' : 'Add New Product'}</CardTitle>
@@ -229,7 +218,7 @@ export default function AdminPage() {
           {formError && (
             <Alert variant="destructive" className="mb-6">
               <ShieldAlert className="h-4 w-4" />
-              <AlertTitle>Action Failed</AlertTitle>
+              <AlertTitle>Error</AlertTitle>
               <AlertDescription>{formError}</AlertDescription>
             </Alert>
           )}
@@ -484,7 +473,7 @@ export default function AdminPage() {
           <AlertDialogDescription>
             This action cannot be undone. This will permanently delete the product
             <span className="font-bold"> {productToDelete?.name}</span>.
-          </AlertDialogDescription>
+          </d_alertDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
           <AlertDialogCancel onClick={() => setProductToDelete(null)} disabled={isDeleting}>Cancel</AlertDialogCancel>
