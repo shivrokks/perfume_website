@@ -1,6 +1,8 @@
 "use client";
 
 import { useState } from 'react';
+import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -11,71 +13,51 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Loader2, MailCheck } from 'lucide-react';
+import { Loader2 } from 'lucide-react';
 
 const loginSchema = z.object({
   email: z.string().email({ message: "Please enter a valid email." }),
+  password: z.string().min(1, { message: "Password is required." }),
 });
-
-const getAuthErrorDescription = (error: any) => {
-    if (!error.code) return error.message || "An unexpected error occurred.";
-    switch (error.code) {
-        case 'auth/invalid-api-key':
-            return "Your Firebase configuration is invalid. Please check your environment variables.";
-        default:
-            return "An error occurred while sending the link. Please try again.";
-    }
-}
 
 export default function LoginPage() {
   const [isLoading, setIsLoading] = useState(false);
-  const [linkSent, setLinkSent] = useState(false);
-  const { sendSignInLink } = useAuth();
+  const { signIn } = useAuth();
+  const router = useRouter();
   const { toast } = useToast();
 
   const form = useForm<z.infer<typeof loginSchema>>({
     resolver: zodResolver(loginSchema),
-    defaultValues: { email: "" },
+    defaultValues: { email: "", password: "" },
   });
 
   const handleLoginSubmit = async (values: z.infer<typeof loginSchema>) => {
     setIsLoading(true);
     try {
-      await sendSignInLink(values.email);
-      setLinkSent(true);
+      await signIn(values.email, values.password);
+      toast({
+        title: "Login Successful",
+        description: "Welcome back!",
+      });
+      router.push('/');
     } catch (error: any) {
-      toast({ variant: "destructive", title: "Login Failed", description: getAuthErrorDescription(error) });
+      console.error("Login error:", error);
+      let description = "An unknown error occurred.";
+      if (error.code === 'auth/user-not-found' || error.code === 'auth/wrong-password' || error.code === 'auth/invalid-credential') {
+        description = "Invalid email or password. Please try again.";
+      }
+      toast({ variant: "destructive", title: "Login Failed", description });
     } finally {
       setIsLoading(false);
     }
   };
 
-  if (linkSent) {
-    return (
-       <div className="container flex min-h-[80vh] items-center justify-center py-12">
-        <Card className="w-full max-w-md text-center">
-            <CardHeader>
-                <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-primary/10">
-                    <MailCheck className="h-8 w-8 text-primary" />
-                </div>
-            </CardHeader>
-            <CardContent>
-                <CardTitle className="font-headline text-3xl">Check your inbox</CardTitle>
-                <CardDescription className="mt-4 text-lg">
-                    We've sent a secure sign-in link to <span className="font-bold text-foreground">{form.getValues('email')}</span>.
-                </CardDescription>
-            </CardContent>
-        </Card>
-      </div>
-    );
-  }
-
   return (
     <div className="container flex min-h-[80vh] items-center justify-center py-12">
       <Card className="w-full max-w-md">
         <CardHeader className="text-center">
-          <CardTitle className="font-headline text-3xl">Sign In or Sign Up</CardTitle>
-          <CardDescription>Enter your email to receive a secure sign-in link.</CardDescription>
+          <CardTitle className="font-headline text-3xl">Welcome Back</CardTitle>
+          <CardDescription>Sign in to your account to continue.</CardDescription>
         </CardHeader>
         <CardContent>
           <Form {...form}>
@@ -91,12 +73,29 @@ export default function LoginPage() {
                   </FormItem>
                 )}
               />
+              <FormField
+                control={form.control}
+                name="password"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Password</FormLabel>
+                    <FormControl><Input type="password" placeholder="••••••••" {...field} /></FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
               <Button type="submit" className="w-full" disabled={isLoading}>
                 {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                Send Sign-In Link
+                Sign In
               </Button>
             </form>
           </Form>
+          <div className="mt-4 text-center text-sm">
+            Don't have an account?{" "}
+            <Link href="/signup" className="underline">
+              Sign up
+            </Link>
+          </div>
         </CardContent>
       </Card>
     </div>

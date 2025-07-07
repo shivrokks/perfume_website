@@ -3,7 +3,7 @@
 
 import Link from "next/link";
 import { Diamond, ShoppingBag, Menu } from "lucide-react";
-import { Button } from "./ui/button";
+import { Button, buttonVariants } from "./ui/button";
 import { ThemeToggle } from "./theme-toggle";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger, SheetFooter } from "./ui/sheet";
 import { useCart } from "@/hooks/use-cart";
@@ -108,7 +108,10 @@ export function Header() {
                   <div className="flex w-full items-center justify-between">
                      <div onClick={() => setIsMobileMenuOpen(false)}>
                        {loading ? null : user ? <UserNav /> : (
-                         <Button asChild><Link href="/login">Login</Link></Button>
+                         <div className="flex items-center gap-2">
+                           <Button asChild><Link href="/login">Login</Link></Button>
+                           <Button asChild variant="outline"><Link href="/signup">Sign Up</Link></Button>
+                         </div>
                        )}
                      </div>
                      <ThemeToggle />
@@ -132,9 +135,14 @@ export function Header() {
           {loading ? null : user ? (
             <UserNav />
           ) : (
-            <Button asChild>
-              <Link href="/login">Login</Link>
-            </Button>
+            <div className="flex items-center gap-2">
+                <Link href="/login" className={cn(buttonVariants({ variant: "ghost" }))}>
+                    Login
+                </Link>
+                <Link href="/signup" className={cn(buttonVariants({ variant: "default" }))}>
+                    Sign Up
+                </Link>
+            </div>
           )}
 
           <Sheet>
