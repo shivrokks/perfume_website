@@ -8,7 +8,6 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useAuth } from '@/hooks/use-auth';
 import { useRouter } from 'next/navigation';
-import Image from 'next/image';
 import { addProduct, updateProduct, deleteProduct } from '@/app/actions';
 import { getProducts } from '@/lib/products';
 import type { Perfume } from '@/lib/types';
@@ -35,7 +34,6 @@ const ProductSchema = z.object({
   notes: z.string().min(1, "Provide comma-separated notes"),
   description: z.string().min(1, "Description is required"),
   ingredients: z.string().min(1, "Provide comma-separated ingredients"),
-  image: z.any().optional(), // Allow file or string
 }).superRefine((data, ctx) => {
   if (data.category === 'Perfume' && (!data.size || data.size.trim() === '')) {
     ctx.addIssue({
@@ -56,7 +54,6 @@ const defaultFormValues = {
   notes: '',
   description: '',
   ingredients: '',
-  image: null,
 };
 
 export default function AdminPage() {
@@ -69,7 +66,6 @@ export default function AdminPage() {
   const [editingProduct, setEditingProduct] = useState<Perfume | null>(null);
   const [productToDelete, setProductToDelete] = useState<Perfume | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
-  const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [formError, setFormError] = useState<string | null>(null);
 
   const form = useForm<z.infer<typeof ProductSchema>>({
@@ -108,20 +104,17 @@ export default function AdminPage() {
   const handleEditClick = (product: Perfume) => {
     setEditingProduct(product);
     setFormError(null);
-    setImagePreview(product.image); // Set current image for preview
     form.reset({
       ...product,
       category: product.category || 'Perfume',
       notes: product.notes.join(', '),
       ingredients: product.ingredients.join(', '),
-      image: product.image, // Pass existing URL to form state
     });
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   const handleCancelEdit = () => {
     setEditingProduct(null);
-    setImagePreview(null);
     setFormError(null);
     form.reset(defaultFormValues);
   };
@@ -155,20 +148,15 @@ export default function AdminPage() {
     setFormError(null); // Reset error on new submission
 
     const formData = new FormData();
-
-    // Handle image separately
-    if (values.image instanceof File) {
-      formData.append('image', values.image);
-    } else if (typeof values.image === 'string') {
-      // For updates, pass the existing URL if no new file is chosen
-      formData.append('image_url', values.image);
-    }
     
-    // Append other values
     for (const key in values) {
-      if (key !== 'image' && values[key] !== undefined && values[key] !== null) {
+      if (values[key] !== undefined && values[key] !== null) {
         formData.append(key, values[key]);
       }
+    }
+    
+    if (editingProduct) {
+      formData.append('image_url', editingProduct.image);
     }
 
     const result = editingProduct 
@@ -182,7 +170,6 @@ export default function AdminPage() {
       });
       form.reset(defaultFormValues);
       setEditingProduct(null);
-      setImagePreview(null);
       fetchProducts(); // Refresh the list
     } else {
         const errorMsg = result.error?._global?.[0] || "An unknown error occurred.";
@@ -366,35 +353,6 @@ export default function AdminPage() {
                       <Input placeholder="Alcohol Denat., Parfum, Aqua" {...field} />
                     </FormControl>
                     <FormDescription>Comma-separated values.</FormDescription>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-               <FormField
-                control={form.control}
-                name="image"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Product Image</FormLabel>
-                    {imagePreview && (
-                      <div className="relative w-40 h-40 mb-4">
-                        <Image src={imagePreview} alt="Product preview" layout="fill" objectFit="cover" className="rounded-md" />
-                      </div>
-                    )}
-                    <FormControl>
-                      <Input 
-                        type="file" 
-                        accept="image/*"
-                        onChange={(e) => {
-                          const file = e.target.files?.[0];
-                          if (file) {
-                            field.onChange(file);
-                            setImagePreview(URL.createObjectURL(file));
-                          }
-                        }}
-                      />
-                    </FormControl>
-                    <FormDescription>Upload a new image. This will replace the current one.</FormDescription>
                     <FormMessage />
                   </FormItem>
                 )}

@@ -3,7 +3,6 @@
 
 import { z } from "zod";
 import { firestore } from "@/lib/firebase";
-import cloudinary from "@/lib/cloudinary";
 import { collection, addDoc, serverTimestamp, doc, getDoc, setDoc, updateDoc, deleteDoc, arrayUnion, arrayRemove } from "firebase/firestore";
 import { revalidatePath } from "next/cache";
 import type { Address } from "@/lib/types";
@@ -29,43 +28,7 @@ const ProductFormSchema = z.object({
   }
 });
 
-async function uploadImage(file: File): Promise<string> {
-  // Explicitly check for environment variables
-  if (!process.env.CLOUDINARY_CLOUD_NAME || !process.env.CLOUDINARY_API_KEY || !process.env.CLOUDINARY_API_SECRET) {
-    throw new Error("Cloudinary API credentials are not configured on the server. Please set them in your environment variables.");
-  }
-
-  if (!file || typeof file.arrayBuffer !== 'function') {
-      console.error('UploadImage Error: Invalid file object received.', file);
-      throw new Error('Invalid file was provided for upload.');
-  }
-
-  const fileBuffer = await file.arrayBuffer();
-  const mime = file.type;
-  const encoding = 'base64';
-  const base64Data = Buffer.from(fileBuffer).toString('base64');
-  const fileUri = 'data:' + mime + ';' + encoding + ',' + base64Data;
-
-  try {
-    const result = await cloudinary.uploader.upload(fileUri, {
-      folder: 'lorve-products',
-    });
-    return result.secure_url;
-  } catch (error: any) {
-    console.error('Cloudinary Upload Error:', error);
-    let errorMessage = 'Image upload failed due to a server error.';
-    if (error.http_code === 401 || error.message?.includes('invalid signature')) {
-      errorMessage = 'Could not authenticate with Cloudinary. Please check your API credentials in the .env file.';
-    } else if (error.message) {
-      errorMessage = `Upload Error: ${error.message}`;
-    }
-    throw new Error(errorMessage);
-  }
-}
-
 export async function addProduct(formData: FormData) {
-  const imageFile = formData.get('image') as File | null;
-  
   const rawData = {
     name: formData.get('name'),
     brand: formData.get('brand'),
@@ -87,17 +50,7 @@ export async function addProduct(formData: FormData) {
     };
   }
   
-  let imageUrl = "https://placehold.co/600x600.png";
-  if (imageFile && imageFile.size > 0) {
-    try {
-      imageUrl = await uploadImage(imageFile);
-    } catch (uploadError: any) {
-      return {
-        success: false,
-        error: { _global: [uploadError.message] },
-      };
-    }
-  }
+  const imageUrl = "https://placehold.co/600x600.png";
 
   const productData = {
     ...parsed.data,
@@ -127,7 +80,6 @@ export async function addProduct(formData: FormData) {
 }
 
 export async function updateProduct(id: string, formData: FormData) {
-  const imageFile = formData.get('image') as File | null;
   const existingImageUrl = formData.get('image_url') as string | null;
 
   const rawData = {
@@ -151,21 +103,9 @@ export async function updateProduct(id: string, formData: FormData) {
     };
   }
   
-  let finalImageUrl = existingImageUrl || "";
-  if (imageFile && imageFile.size > 0) {
-    try {
-      finalImageUrl = await uploadImage(imageFile);
-    } catch (uploadError: any) {
-       return {
-        success: false,
-        error: { _global: [uploadError.message] },
-      };
-    }
-  }
-
   const productData = {
     ...parsed.data,
-    image: finalImageUrl,
+    image: existingImageUrl || "https://placehold.co/600x600.png",
   };
 
   try {
