@@ -1,4 +1,3 @@
-
 // @ts-nocheck
 "use client";
 
@@ -108,7 +107,12 @@ export function Header() {
                   {/* Auth & Theme for mobile */}
                   <div className="flex w-full items-center justify-between">
                      <div onClick={() => setIsMobileMenuOpen(false)}>
-                       {loading ? null : user ? <UserNav /> : <Button asChild variant="ghost"><Link href="/login">Login</Link></Button>}
+                       {loading ? null : user ? <UserNav /> : (
+                        <div className="flex items-center gap-2">
+                           <Button asChild><Link href="/login">Login</Link></Button>
+                           <Button asChild variant="secondary"><Link href="/signup">Sign Up</Link></Button>
+                        </div>
+                       )}
                      </div>
                      <ThemeToggle />
                   </div>
@@ -131,9 +135,14 @@ export function Header() {
           {loading ? null : user ? (
             <UserNav />
           ) : (
-            <Button asChild variant="ghost">
-              <Link href="/login">Login</Link>
-            </Button>
+            <>
+              <Button asChild variant="ghost">
+                <Link href="/login">Login</Link>
+              </Button>
+              <Button asChild>
+                <Link href="/signup">Sign Up</Link>
+              </Button>
+            </>
           )}
 
           <Sheet>

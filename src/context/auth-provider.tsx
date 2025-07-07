@@ -1,4 +1,3 @@
-
 // @ts-nocheck
 "use client";
 
@@ -28,7 +27,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       setUser(user);
-      setIsAdmin(user ? user.email === adminEmail : false);
+      setIsAdmin(user ? user.email?.toLowerCase() === adminEmail.toLowerCase() : false);
       setLoading(false);
     });
 
