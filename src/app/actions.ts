@@ -3,11 +3,14 @@
 
 import { z } from "zod";
 import { firestore } from "@/lib/firebase";
+import cloudinary from "@/lib/cloudinary";
 import { collection, addDoc, serverTimestamp, doc, getDoc, setDoc, updateDoc, deleteDoc, arrayUnion, arrayRemove } from "firebase/firestore";
 import { revalidatePath } from "next/cache";
 import type { Address } from "@/lib/types";
 
-// Schema for validating form fields
+const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
+const ACCEPTED_IMAGE_TYPES = ["image/jpeg", "image/jpg", "image/png", "image/webp"];
+
 const ProductFormSchema = z.object({
   name: z.string().min(1, "Name is required"),
   brand: z.string().min(1, "Brand is required"),
@@ -18,6 +21,11 @@ const ProductFormSchema = z.object({
   notes: z.string().min(1, "Notes are required"),
   description: z.string().min(1, "Description is required"),
   ingredients: z.string().min(1, "Ingredients are required"),
+  image: z
+    .instanceof(File)
+    .optional()
+    .refine(file => !file || file.size <= MAX_FILE_SIZE, 'Image must be less than 5MB')
+    .refine(file => !file || ACCEPTED_IMAGE_TYPES.includes(file.type), 'Only .jpg, .jpeg, .png and .webp formats are supported.'),
 }).superRefine((data, ctx) => {
   if (data.category === 'Perfume' && (!data.size || data.size.trim() === '')) {
     ctx.addIssue({
@@ -28,19 +36,22 @@ const ProductFormSchema = z.object({
   }
 });
 
-export async function addProduct(formData: FormData) {
-  const rawData = {
-    name: formData.get('name'),
-    brand: formData.get('brand'),
-    price: formData.get('price'),
-    gender: formData.get('gender'),
-    category: formData.get('category'),
-    size: formData.get('size'),
-    notes: formData.get('notes'),
-    description: formData.get('description'),
-    ingredients: formData.get('ingredients'),
-  };
+const uploadStream = (buffer: Buffer, options: any): Promise<any> => {
+  return new Promise((resolve, reject) => {
+    const stream = cloudinary.uploader.upload_stream(options, (error, result) => {
+      if (result) {
+        resolve(result);
+      } else {
+        reject(error);
+      }
+    });
+    stream.end(buffer);
+  });
+};
 
+export async function addProduct(formData: FormData) {
+  const rawData = Object.fromEntries(formData.entries());
+  
   const parsed = ProductFormSchema.safeParse(rawData);
 
   if (!parsed.success) {
@@ -49,15 +60,32 @@ export async function addProduct(formData: FormData) {
       error: parsed.error.flatten().fieldErrors,
     };
   }
-  
-  const imageUrl = "https://placehold.co/600x600.png";
 
-  const productData = {
-    ...parsed.data,
-    image: imageUrl,
-  };
+  const { image: imageFile, ...productDataFields } = parsed.data;
 
   try {
+    let imageUrl: string;
+
+    if (imageFile && imageFile.size > 0) {
+      const arrayBuffer = await imageFile.arrayBuffer();
+      const buffer = Buffer.from(arrayBuffer);
+      const uploadResult = await uploadStream(buffer, {
+        folder: 'lorve-products',
+        resource_type: 'image'
+      });
+      imageUrl = uploadResult.secure_url;
+    } else {
+       return {
+            success: false,
+            error: { image: ["Product image is required."] }
+       };
+    }
+
+    const productData = {
+      ...productDataFields,
+      image: imageUrl,
+    };
+
     await addDoc(collection(firestore, "products"), {
       ...productData,
       notes: productData.notes.split(',').map(note => note.trim()),
@@ -81,18 +109,7 @@ export async function addProduct(formData: FormData) {
 
 export async function updateProduct(id: string, formData: FormData) {
   const existingImageUrl = formData.get('image_url') as string | null;
-
-  const rawData = {
-    name: formData.get('name'),
-    brand: formData.get('brand'),
-    price: formData.get('price'),
-    gender: formData.get('gender'),
-    category: formData.get('category'),
-    size: formData.get('size'),
-    notes: formData.get('notes'),
-    description: formData.get('description'),
-    ingredients: formData.get('ingredients'),
-  };
+  const rawData = Object.fromEntries(formData.entries());
 
   const parsed = ProductFormSchema.safeParse(rawData);
 
@@ -103,12 +120,25 @@ export async function updateProduct(id: string, formData: FormData) {
     };
   }
   
-  const productData = {
-    ...parsed.data,
-    image: existingImageUrl || "https://placehold.co/600x600.png",
-  };
+  const { image: imageFile, ...productDataFields } = parsed.data;
+  let imageUrl = existingImageUrl || "https://placehold.co/600x600.png";
 
   try {
+    if (imageFile && imageFile.size > 0) {
+        const arrayBuffer = await imageFile.arrayBuffer();
+        const buffer = Buffer.from(arrayBuffer);
+        const uploadResult = await uploadStream(buffer, {
+            folder: 'lorve-products',
+            resource_type: 'image'
+        });
+        imageUrl = uploadResult.secure_url;
+    }
+
+    const productData = {
+        ...productDataFields,
+        image: imageUrl
+    };
+
     const productRef = doc(firestore, "products", id);
     await updateDoc(productRef, {
       ...productData,

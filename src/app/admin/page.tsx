@@ -8,6 +8,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useAuth } from '@/hooks/use-auth';
 import { useRouter } from 'next/navigation';
+import Image from 'next/image';
 import { addProduct, updateProduct, deleteProduct } from '@/app/actions';
 import { getProducts } from '@/lib/products';
 import type { Perfume } from '@/lib/types';
@@ -34,6 +35,7 @@ const ProductSchema = z.object({
   notes: z.string().min(1, "Provide comma-separated notes"),
   description: z.string().min(1, "Description is required"),
   ingredients: z.string().min(1, "Provide comma-separated ingredients"),
+  image: z.any().optional(),
 }).superRefine((data, ctx) => {
   if (data.category === 'Perfume' && (!data.size || data.size.trim() === '')) {
     ctx.addIssue({
@@ -54,6 +56,7 @@ const defaultFormValues = {
   notes: '',
   description: '',
   ingredients: '',
+  image: undefined,
 };
 
 export default function AdminPage() {
@@ -109,6 +112,7 @@ export default function AdminPage() {
       category: product.category || 'Perfume',
       notes: product.notes.join(', '),
       ingredients: product.ingredients.join(', '),
+      image: undefined, // Reset image field
     });
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
@@ -145,14 +149,20 @@ export default function AdminPage() {
   };
 
   async function onSubmit(values: z.infer<typeof ProductSchema>) {
-    setFormError(null); // Reset error on new submission
+    setFormError(null);
 
     const formData = new FormData();
     
+    // Append all form values, but handle image separately
     for (const key in values) {
-      if (values[key] !== undefined && values[key] !== null) {
+      if (key !== 'image' && values[key] !== undefined && values[key] !== null) {
         formData.append(key, values[key]);
       }
+    }
+
+    const imageFileList = form.getValues('image');
+    if (imageFileList && imageFileList.length > 0) {
+      formData.append('image', imageFileList[0]);
     }
     
     if (editingProduct) {
@@ -172,7 +182,16 @@ export default function AdminPage() {
       setEditingProduct(null);
       fetchProducts(); // Refresh the list
     } else {
-        const errorMsg = result.error?._global?.[0] || "An unknown error occurred.";
+        const fieldErrors = result.error;
+        let errorMsg = "An unknown error occurred.";
+        if (fieldErrors?._global) {
+          errorMsg = fieldErrors._global[0];
+        } else if (fieldErrors) {
+          // If there are field-specific errors, construct a message.
+          const firstErrorField = Object.keys(fieldErrors)[0];
+          errorMsg = fieldErrors[firstErrorField]?.[0] || 'Please check the form for errors.';
+          form.setError(firstErrorField, { type: 'manual', message: errorMsg });
+        }
         setFormError(errorMsg);
         toast({
             variant: 'destructive',
@@ -357,6 +376,35 @@ export default function AdminPage() {
                   </FormItem>
                 )}
               />
+
+              {editingProduct && editingProduct.image && (
+                <div className="space-y-2">
+                  <p className="text-sm font-medium">Current Image</p>
+                  <Image src={editingProduct.image} alt="Current product image" width={100} height={100} className="rounded-md border object-cover" />
+                </div>
+              )}
+
+              <FormField
+                control={form.control}
+                name="image"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Product Image</FormLabel>
+                    <FormControl>
+                      <Input 
+                        type="file" 
+                        accept="image/*" 
+                        onChange={(e) => field.onChange(e.target.files)}
+                      />
+                    </FormControl>
+                    <FormDescription>
+                      {editingProduct ? 'Leave blank to keep current image.' : 'Image is required.'} Max 5MB.
+                    </FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
               <div className="flex items-center gap-4">
                 <Button type="submit" disabled={isSubmitting}>
                   {isSubmitting ? (
@@ -392,6 +440,7 @@ export default function AdminPage() {
             <Table>
               <TableHeader>
                 <TableRow>
+                  <TableHead className="w-[80px]">Image</TableHead>
                   <TableHead>Name</TableHead>
                   <TableHead>Category</TableHead>
                   <TableHead>Size</TableHead>
@@ -403,6 +452,9 @@ export default function AdminPage() {
               <TableBody>
                 {products.map((product) => (
                   <TableRow key={product.id}>
+                    <TableCell>
+                      <Image src={product.image} alt={product.name} width={48} height={48} className="rounded-md border object-cover" />
+                    </TableCell>
                     <TableCell className="font-medium">{product.name}</TableCell>
                     <TableCell>{product.category}</TableCell>
                     <TableCell>{product.category === 'Oils' ? '-' : product.size}</TableCell>
