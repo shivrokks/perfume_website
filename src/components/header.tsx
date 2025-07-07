@@ -108,10 +108,7 @@ export function Header() {
                   <div className="flex w-full items-center justify-between">
                      <div onClick={() => setIsMobileMenuOpen(false)}>
                        {loading ? null : user ? <UserNav /> : (
-                        <div className="flex items-center gap-2">
-                           <Button asChild><Link href="/login">Login</Link></Button>
-                           <Button asChild variant="secondary"><Link href="/signup">Sign Up</Link></Button>
-                        </div>
+                         <Button asChild><Link href="/login">Login</Link></Button>
                        )}
                      </div>
                      <ThemeToggle />
@@ -135,14 +132,9 @@ export function Header() {
           {loading ? null : user ? (
             <UserNav />
           ) : (
-            <>
-              <Button asChild variant="ghost">
-                <Link href="/login">Login</Link>
-              </Button>
-              <Button asChild>
-                <Link href="/signup">Sign Up</Link>
-              </Button>
-            </>
+            <Button asChild>
+              <Link href="/login">Login</Link>
+            </Button>
           )}
 
           <Sheet>

@@ -2,7 +2,7 @@
 "use client";
 
 import React, { createContext, useState, useEffect, ReactNode } from 'react';
-import { onAuthStateChanged, User, signOut as firebaseSignOut, createUserWithEmailAndPassword, signInWithEmailAndPassword } from 'firebase/auth';
+import { onAuthStateChanged, User, signOut as firebaseSignOut, sendSignInLinkToEmail } from 'firebase/auth';
 import { auth } from '@/lib/firebase';
 import { Loader2 } from 'lucide-react';
 
@@ -10,8 +10,7 @@ interface AuthContextType {
   user: User | null;
   isAdmin: boolean;
   loading: boolean;
-  signInWithEmail: (email, password) => Promise<any>;
-  signUpWithEmail: (email, password) => Promise<any>;
+  sendSignInLink: (email: string) => Promise<void>;
   signOut: () => Promise<void>;
 }
 
@@ -34,12 +33,13 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     return () => unsubscribe();
   }, []);
 
-  const signInWithEmail = (email, password) => {
-    return signInWithEmailAndPassword(auth, email, password);
-  }
-
-  const signUpWithEmail = (email, password) => {
-    return createUserWithEmailAndPassword(auth, email, password);
+  const sendSignInLink = async (email: string) => {
+    const actionCodeSettings = {
+      url: `${window.location.origin}/finish-signin`,
+      handleCodeInApp: true,
+    };
+    await sendSignInLinkToEmail(auth, email, actionCodeSettings);
+    window.localStorage.setItem('emailForSignIn', email);
   }
 
   const signOut = () => {
@@ -55,7 +55,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   }
 
   return (
-    <AuthContext.Provider value={{ user, isAdmin, loading, signInWithEmail, signUpWithEmail, signOut }}>
+    <AuthContext.Provider value={{ user, isAdmin, loading, sendSignInLink, signOut }}>
       {children}
     </AuthContext.Provider>
   );
