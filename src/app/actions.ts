@@ -2,11 +2,12 @@
 "use server";
 
 import { z } from "zod";
-import { firestore } from "@/lib/firebase";
+import { firestore, auth } from "@/lib/firebase";
 import cloudinary from "@/lib/cloudinary";
-import { collection, addDoc, serverTimestamp, doc, getDoc, setDoc, updateDoc, deleteDoc } from "firebase/firestore";
+import { collection, addDoc, serverTimestamp, doc, getDoc, setDoc, updateDoc, deleteDoc, arrayUnion, arrayRemove } from "firebase/firestore";
 import { revalidatePath } from "next/cache";
 import type { Address } from "@/lib/types";
+import { sendPasswordResetEmail } from "firebase/auth";
 
 // Schema for validating form fields
 const ProductFormSchema = z.object({
@@ -247,5 +248,62 @@ export async function upsertUserAddress(userId: string, address: Address) {
       success: false,
       error: errorMessage
     };
+  }
+}
+
+// Admin Management Actions
+
+export async function getAdminEmails(): Promise<{ emails?: string[], error?: string }> {
+  try {
+    const adminDocRef = doc(firestore, 'settings', 'admin_users');
+    const adminDoc = await getDoc(adminDocRef);
+    if (adminDoc.exists()) {
+      return { emails: adminDoc.data().emails || [] };
+    }
+    // If doc doesn't exist, return empty array
+    return { emails: [] };
+  } catch (error: any) {
+    return { error: "Could not fetch admin users." };
+  }
+}
+
+export async function addAdminEmail(email: string): Promise<{ success: boolean; error?: string }> {
+  if (!email || !z.string().email().safeParse(email).success) {
+    return { success: false, error: 'A valid email is required.' };
+  }
+  const adminDocRef = doc(firestore, 'settings', 'admin_users');
+  try {
+    // Using set with merge to create the document if it doesn't exist
+    await setDoc(adminDocRef, { emails: arrayUnion(email.toLowerCase()) }, { merge: true });
+    revalidatePath('/admin/settings');
+    return { success: true };
+  } catch (error: any) {
+    return { success: false, error: "Failed to add new admin." };
+  }
+}
+
+export async function removeAdminEmail(email: string): Promise<{ success: boolean; error?: string }> {
+  if (!email) {
+    return { success: false, error: 'Email is required.' };
+  }
+  const adminDocRef = doc(firestore, 'settings', 'admin_users');
+  try {
+    await updateDoc(adminDocRef, { emails: arrayRemove(email.toLowerCase()) });
+    revalidatePath('/admin/settings');
+    return { success: true };
+  } catch (error: any) {
+    return { success: false, error: "Failed to remove admin." };
+  }
+}
+
+export async function sendPasswordReset(email: string): Promise<{ success: boolean; error?: string }> {
+  if (!email) {
+    return { success: false, error: "Email is required to send a password reset." };
+  }
+  try {
+    await sendPasswordResetEmail(auth, email);
+    return { success: true };
+  } catch (error: any) {
+    return { success: false, error: error.message };
   }
 }

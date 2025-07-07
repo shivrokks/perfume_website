@@ -3,7 +3,8 @@
 
 import React, { createContext, useState, useEffect, ReactNode } from 'react';
 import { onAuthStateChanged, User, signOut as firebaseSignOut, createUserWithEmailAndPassword, signInWithEmailAndPassword } from 'firebase/auth';
-import { auth } from '@/lib/firebase';
+import { auth, firestore } from '@/lib/firebase';
+import { doc, getDoc } from 'firebase/firestore';
 import { Loader2 } from 'lucide-react';
 
 interface AuthContextType {
@@ -17,7 +18,7 @@ interface AuthContextType {
 
 export const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-const adminEmail = "shivansh121shukla@gmail.com";
+const fallbackAdminEmail = "shivansh121shukla@gmail.com";
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
@@ -25,9 +26,29 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [isAdmin, setIsAdmin] = useState(false);
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
-      setUser(user);
-      setIsAdmin(user ? user.email?.toLowerCase() === adminEmail.toLowerCase() : false);
+    const unsubscribe = onAuthStateChanged(auth, async (user) => {
+      if (user) {
+        setUser(user);
+        try {
+          const isFallbackAdmin = user.email?.toLowerCase() === fallbackAdminEmail;
+          
+          const adminDocRef = doc(firestore, 'settings', 'admin_users');
+          const adminDoc = await getDoc(adminDocRef);
+
+          if (adminDoc.exists()) {
+            const adminEmails = adminDoc.data().emails?.map((e: string) => e.toLowerCase()) || [];
+            setIsAdmin(isFallbackAdmin || adminEmails.includes(user.email?.toLowerCase() ?? ''));
+          } else {
+            setIsAdmin(isFallbackAdmin);
+          }
+        } catch (error) {
+          console.error("Error checking admin status:", error);
+          setIsAdmin(user.email?.toLowerCase() === fallbackAdminEmail);
+        }
+      } else {
+        setUser(null);
+        setIsAdmin(false);
+      }
       setLoading(false);
     });
 

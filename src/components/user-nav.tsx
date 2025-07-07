@@ -16,7 +16,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { useRouter } from "next/navigation";
 import { useToast } from "@/hooks/use-toast";
-import { CreditCard, LayoutDashboard, LogOut, User } from "lucide-react";
+import { CreditCard, LayoutDashboard, LogOut, Settings, User } from "lucide-react";
 
 export function UserNav() {
   const { user, signOut, isAdmin } = useAuth();
@@ -64,12 +64,20 @@ export function UserNav() {
         <DropdownMenuSeparator />
         <DropdownMenuGroup>
           {isAdmin && (
-            <DropdownMenuItem asChild>
-              <Link href="/admin">
-                <LayoutDashboard className="mr-2 h-4 w-4" />
-                <span>Admin</span>
-              </Link>
-            </DropdownMenuItem>
+            <>
+              <DropdownMenuItem asChild>
+                <Link href="/admin">
+                  <LayoutDashboard className="mr-2 h-4 w-4" />
+                  <span>Product Dashboard</span>
+                </Link>
+              </DropdownMenuItem>
+              <DropdownMenuItem asChild>
+                <Link href="/admin/settings">
+                  <Settings className="mr-2 h-4 w-4" />
+                  <span>Admin Settings</span>
+                </Link>
+              </DropdownMenuItem>
+            </>
           )}
           <DropdownMenuItem asChild>
              <Link href="/billing">
