@@ -473,7 +473,7 @@ export default function AdminPage() {
           <AlertDialogDescription>
             This action cannot be undone. This will permanently delete the product
             <span className="font-bold"> {productToDelete?.name}</span>.
-          </d_alertDescription>
+          </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
           <AlertDialogCancel onClick={() => setProductToDelete(null)} disabled={isDeleting}>Cancel</AlertDialogCancel>
