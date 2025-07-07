@@ -1,3 +1,4 @@
+
 // @ts-nocheck
 "use client";
 
@@ -5,15 +6,28 @@ import React, { useState, useEffect } from 'react';
 import { useAuth } from '@/hooks/use-auth';
 import { useRouter } from 'next/navigation';
 import { useToast } from '@/hooks/use-toast';
-import { getAdminEmails, addAdminEmail, removeAdminEmail, sendPasswordReset } from '@/app/actions';
+import { getAdminEmails, addAdminEmail, removeAdminEmail } from '@/app/actions';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { z } from 'zod';
+
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Loader2, ShieldAlert, Trash2, UserPlus } from 'lucide-react';
 
+const passwordSchema = z.object({
+  password: z.string().min(6, "Password must be at least 6 characters."),
+  confirmPassword: z.string(),
+}).refine(data => data.password === data.confirmPassword, {
+  message: "Passwords do not match.",
+  path: ["confirmPassword"],
+});
+
 export default function AdminSettingsPage() {
-  const { user, isAdmin, loading } = useAuth();
+  const { user, isAdmin, loading, updatePassword } = useAuth();
   const router = useRouter();
   const { toast } = useToast();
   
@@ -21,6 +35,12 @@ export default function AdminSettingsPage() {
   const [newAdminEmail, setNewAdminEmail] = useState('');
   const [isFetching, setIsFetching] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isUpdatingPassword, setIsUpdatingPassword] = useState(false);
+
+  const passwordForm = useForm<z.infer<typeof passwordSchema>>({
+    resolver: zodResolver(passwordSchema),
+    defaultValues: { password: '', confirmPassword: '' },
+  });
 
   useEffect(() => {
     if (!loading && !isAdmin) {
@@ -73,13 +93,22 @@ export default function AdminSettingsPage() {
     }
   };
 
-  const handlePasswordReset = async () => {
-    if (!user?.email) return;
-    const result = await sendPasswordReset(user.email);
-    if (result.success) {
-      toast({ title: 'Email Sent', description: 'A password reset link has been sent to your email.' });
-    } else {
-      toast({ variant: 'destructive', title: 'Error', description: result.error });
+  const onPasswordSubmit = async (values: z.infer<typeof passwordSchema>) => {
+    setIsUpdatingPassword(true);
+    try {
+      await updatePassword(values.password);
+      toast({ title: "Success", description: "Your password has been updated." });
+      passwordForm.reset();
+    } catch (error: any) {
+      let description = "An unexpected error occurred.";
+      if(error.code === 'auth/requires-recent-login') {
+        description = "This is a sensitive operation. Please log out and log back in before changing your password."
+      } else if (error.message) {
+        description = error.message;
+      }
+      toast({ variant: 'destructive', title: 'Update Failed', description });
+    } finally {
+      setIsUpdatingPassword(false);
     }
   };
   
@@ -152,13 +181,40 @@ export default function AdminSettingsPage() {
           <CardDescription>Manage your personal admin account.</CardDescription>
         </CardHeader>
         <CardContent>
-           <div className="flex items-center justify-between rounded-lg border p-4">
-              <div>
-                <h4 className="font-medium">Change Password</h4>
-                <p className="text-sm text-muted-foreground">A secure link will be sent to your email to reset your password.</p>
-              </div>
-              <Button onClick={handlePasswordReset}>Send Reset Link</Button>
-           </div>
+           <Form {...passwordForm}>
+            <form onSubmit={passwordForm.handleSubmit(onPasswordSubmit)} className="space-y-6">
+              <FormField
+                control={passwordForm.control}
+                name="password"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>New Password</FormLabel>
+                    <FormControl>
+                      <Input type="password" placeholder="••••••••" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={passwordForm.control}
+                name="confirmPassword"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Confirm New Password</FormLabel>
+                    <FormControl>
+                      <Input type="password" placeholder="••••••••" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <Button type="submit" disabled={isUpdatingPassword}>
+                {isUpdatingPassword && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                Update Password
+              </Button>
+            </form>
+          </Form>
         </CardContent>
       </Card>
     </div>

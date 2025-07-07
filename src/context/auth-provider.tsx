@@ -1,8 +1,9 @@
+
 // @ts-nocheck
 "use client";
 
 import React, { createContext, useState, useEffect, ReactNode } from 'react';
-import { onAuthStateChanged, User, signOut as firebaseSignOut, createUserWithEmailAndPassword, signInWithEmailAndPassword } from 'firebase/auth';
+import { onAuthStateChanged, User, signOut as firebaseSignOut, createUserWithEmailAndPassword, signInWithEmailAndPassword, updatePassword as firebaseUpdatePassword } from 'firebase/auth';
 import { auth, firestore } from '@/lib/firebase';
 import { doc, getDoc } from 'firebase/firestore';
 import { Loader2 } from 'lucide-react';
@@ -14,6 +15,7 @@ interface AuthContextType {
   signUp: (email, password) => Promise<any>;
   signIn: (email, password) => Promise<any>;
   signOut: () => Promise<void>;
+  updatePassword: (password: string) => Promise<void>;
 }
 
 export const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -67,6 +69,13 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     return firebaseSignOut(auth);
   }
 
+  const updatePassword = (newPassword: string) => {
+    if (!user) {
+      return Promise.reject(new Error("You must be logged in to update your password."));
+    }
+    return firebaseUpdatePassword(user, newPassword);
+  }
+
   if (loading) {
     return (
         <div className="flex h-screen items-center justify-center">
@@ -76,7 +85,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   }
 
   return (
-    <AuthContext.Provider value={{ user, isAdmin, loading, signUp, signIn, signOut }}>
+    <AuthContext.Provider value={{ user, isAdmin, loading, signUp, signIn, signOut, updatePassword }}>
       {children}
     </AuthContext.Provider>
   );

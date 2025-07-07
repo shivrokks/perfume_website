@@ -2,12 +2,11 @@
 "use server";
 
 import { z } from "zod";
-import { firestore, auth } from "@/lib/firebase";
+import { firestore } from "@/lib/firebase";
 import cloudinary from "@/lib/cloudinary";
 import { collection, addDoc, serverTimestamp, doc, getDoc, setDoc, updateDoc, deleteDoc, arrayUnion, arrayRemove } from "firebase/firestore";
 import { revalidatePath } from "next/cache";
 import type { Address } from "@/lib/types";
-import { sendPasswordResetEmail } from "firebase/auth";
 
 // Schema for validating form fields
 const ProductFormSchema = z.object({
@@ -293,17 +292,5 @@ export async function removeAdminEmail(email: string): Promise<{ success: boolea
     return { success: true };
   } catch (error: any) {
     return { success: false, error: "Failed to remove admin." };
-  }
-}
-
-export async function sendPasswordReset(email: string): Promise<{ success: boolean; error?: string }> {
-  if (!email) {
-    return { success: false, error: "Email is required to send a password reset." };
-  }
-  try {
-    await sendPasswordResetEmail(auth, email);
-    return { success: true };
-  } catch (error: any) {
-    return { success: false, error: error.message };
   }
 }
