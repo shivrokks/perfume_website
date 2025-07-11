@@ -18,8 +18,8 @@ import { AddressSchema } from '@/lib/schemas';
 import type { Address } from '@/lib/types';
 
 
-export default function BillingPage() {
-  const { user, loading } = useAuth();
+export default function ProfilePage() {
+  const { user, loading, refreshUserData } = useAuth();
   const router = useRouter();
   const { toast } = useToast();
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -44,7 +44,7 @@ export default function BillingPage() {
       toast({
         variant: 'destructive',
         title: 'Unauthorized',
-        description: 'You must be logged in to view the billing page.',
+        description: 'You must be logged in to view the profile page.',
       });
       router.push('/login');
     }
@@ -82,7 +82,8 @@ export default function BillingPage() {
     setIsSubmitting(true);
     const result = await upsertUserAddress(user.uid, values);
     if (result.success) {
-      toast({ title: 'Success', description: 'Your address has been saved.' });
+      toast({ title: 'Success', description: 'Your profile has been saved.' });
+      await refreshUserData(); // Refresh user data to update header
     } else {
       toast({ variant: 'destructive', title: 'Error', description: result.error });
     }
@@ -100,14 +101,14 @@ export default function BillingPage() {
   return (
     <div className="container mx-auto py-12 max-w-4xl">
       <div className="mb-12">
-        <h1 className="font-headline text-4xl md:text-5xl font-bold">Account</h1>
-        <p className="text-muted-foreground mt-2 text-lg">Manage your shipping details.</p>
+        <h1 className="font-headline text-4xl md:text-5xl font-bold">Your Profile</h1>
+        <p className="text-muted-foreground mt-2 text-lg">Manage your personal and shipping details.</p>
       </div>
 
       <Card>
         <CardHeader>
-          <CardTitle>Shipping Address</CardTitle>
-          <CardDescription>This is the address we'll use for your deliveries.</CardDescription>
+          <CardTitle>Personal & Shipping Information</CardTitle>
+          <CardDescription>This information will be used for shipping and contact purposes.</CardDescription>
         </CardHeader>
         <CardContent>
           {isAddressLoading ? (
@@ -118,7 +119,17 @@ export default function BillingPage() {
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <FormField
+                 <FormField
+                    name="email"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Email</FormLabel>
+                        <FormControl><Input placeholder="you@example.com" disabled value={user.email || ''} /></FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                 <FormField
                   control={form.control}
                   name="fullName"
                   render={({ field }) => (
@@ -129,6 +140,8 @@ export default function BillingPage() {
                     </FormItem>
                   )}
                 />
+              </div>
+
                 <FormField
                   control={form.control}
                   name="phone"
@@ -140,7 +153,6 @@ export default function BillingPage() {
                     </FormItem>
                   )}
                 />
-              </div>
 
                <FormField
                   control={form.control}
@@ -216,7 +228,7 @@ export default function BillingPage() {
               </div>
               <Button type="submit" disabled={isSubmitting}>
                 {isSubmitting ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
-                Save Address
+                Save Profile
               </Button>
             </form>
           </Form>

@@ -207,7 +207,7 @@ export async function upsertUserAddress(userId: string, address: Address) {
     await setDoc(userDocRef, { address }, { merge: true });
     
     revalidatePath('/checkout');
-    revalidatePath('/billing');
+    revalidatePath('/profile');
 
     return { success: true };
   } catch (error: any) {

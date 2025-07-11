@@ -20,7 +20,7 @@ import { useToast } from "@/hooks/use-toast";
 import { CreditCard, LayoutDashboard, LogOut, Settings, User } from "lucide-react";
 
 export function UserNav() {
-  const { user, signOut, isAdmin } = useAuth();
+  const { user, signOut, isAdmin, userData } = useAuth();
   const router = useRouter();
   const { toast } = useToast();
 
@@ -37,29 +37,41 @@ export function UserNav() {
   if (!user) return null;
 
   // Get user initials for avatar fallback
-  const getInitials = (email) => {
-    if (!email) return 'U';
-    const parts = email.split('@');
-    return parts[0].charAt(0).toUpperCase();
+  const getInitials = (nameOrEmail) => {
+    if (!nameOrEmail) return 'U';
+    
+    // If it's an email, get first letter
+    if (nameOrEmail.includes('@')) {
+      return nameOrEmail.charAt(0).toUpperCase();
+    }
+    
+    // If it's a name, get initials from first/last name
+    const names = nameOrEmail.split(' ');
+    if (names.length > 1) {
+      return `${names[0][0]}${names[names.length - 1][0]}`.toUpperCase();
+    }
+    return names[0][0].toUpperCase();
   }
+  
+  const displayName = userData?.address?.fullName || user.email;
 
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button variant="ghost" className="relative h-10 gap-2 px-2">
            <Avatar className="h-8 w-8">
-            <AvatarImage src={user.photoURL || ""} alt={user.email || ""} />
-            <AvatarFallback>{getInitials(user.email)}</AvatarFallback>
+            <AvatarImage src={user.photoURL || ""} alt={displayName || ""} />
+            <AvatarFallback>{getInitials(displayName)}</AvatarFallback>
           </Avatar>
           <span className="hidden text-sm font-medium text-foreground/80 transition-colors hover:text-foreground lg:block">
-            {user.email}
+            {displayName}
           </span>
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent className="w-56" align="end" forceMount>
         <DropdownMenuLabel className="font-normal">
           <div className="flex flex-col space-y-1">
-            <p className="text-sm font-medium leading-none">Account</p>
+            <p className="text-sm font-medium leading-none">{userData?.address?.fullName || 'Account'}</p>
             <p className="text-xs leading-none text-muted-foreground">
               {user.email}
             </p>
@@ -67,6 +79,12 @@ export function UserNav() {
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
         <DropdownMenuGroup>
+           <DropdownMenuItem asChild>
+             <Link href="/profile">
+                <User className="mr-2 h-4 w-4" />
+                <span>Profile</span>
+            </Link>
+          </DropdownMenuItem>
           {isAdmin && (
             <>
               <DropdownMenuItem asChild>
@@ -83,12 +101,6 @@ export function UserNav() {
               </DropdownMenuItem>
             </>
           )}
-          <DropdownMenuItem asChild>
-             <Link href="/billing">
-                <CreditCard className="mr-2 h-4 w-4" />
-                <span>Billing</span>
-            </Link>
-          </DropdownMenuItem>
         </DropdownMenuGroup>
         <DropdownMenuSeparator />
         <DropdownMenuItem onClick={handleSignOut}>
