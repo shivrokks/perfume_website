@@ -31,7 +31,7 @@ export function Header() {
   const pathname = usePathname();
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b bg-secondary">
+    <header className="sticky top-0 z-50 w-full border-b bg-background/80 backdrop-blur-sm">
       <div className="container flex h-16 items-center">
         {/* DESKTOP: LOGO & NAV */}
         <div className="mr-auto hidden md:flex">
