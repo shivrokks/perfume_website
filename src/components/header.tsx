@@ -32,13 +32,13 @@ export function Header() {
 
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/80 backdrop-blur-sm">
-      <div className="container flex h-16 items-center">
+      <div className="container flex h-20 items-center">
         {/* DESKTOP: LOGO & NAV */}
         <div className="mr-auto hidden md:flex">
-          <Link href="/" className="mr-8 flex items-center space-x-2">
-            <Image src="https://res.cloudinary.com/dbwvn4eu9/image/upload/v1752211770/kk_logo-removebg-preview_ysrakm.png" alt="LORVÉ logo" width={100} height={40} className="h-10 w-auto" />
+          <Link href="/" className="mr-12 flex items-center space-x-2">
+            <Image src="https://res.cloudinary.com/dbwvn4eu9/image/upload/v1752211770/kk_logo-removebg-preview_ysrakm.png" alt="LORVÉ logo" width={100} height={40} className="h-12 w-auto" />
           </Link>
-          <nav className="flex items-center space-x-8 text-sm font-medium">
+          <nav className="flex items-center space-x-10 text-base font-medium">
              {navLinks.map((link) => (
                 <Link
                   key={link.href}
@@ -135,10 +135,10 @@ export function Header() {
             <UserNav />
           ) : (
             <div className="flex items-center gap-2">
-                <Link href="/login" className={cn(buttonVariants({ variant: "ghost" }))}>
+                <Link href="/login" className={cn(buttonVariants({ variant: "ghost", size: "lg" }))}>
                     Login
                 </Link>
-                <Link href="/signup" className={cn(buttonVariants({ variant: "default" }))}>
+                <Link href="/signup" className={cn(buttonVariants({ variant: "default", size: "lg" }))}>
                     Sign Up
                 </Link>
             </div>
@@ -146,12 +146,12 @@ export function Header() {
 
           <Sheet>
             <SheetTrigger asChild>
-              <Button variant="ghost" size="icon" className="relative">
-                <ShoppingBag className="h-5 w-5" />
+              <Button variant="ghost" size="icon" className="relative h-12 w-12">
+                <ShoppingBag className="h-6 w-6" />
                 {cartCount > 0 && (
                   <Badge
                     variant="destructive"
-                    className="absolute -right-2 -top-2 h-5 w-5 justify-center rounded-full p-0 text-xs"
+                    className="absolute -right-1 -top-1 h-5 w-5 justify-center rounded-full p-0 text-xs"
                   >
                     {cartCount}
                   </Badge>
