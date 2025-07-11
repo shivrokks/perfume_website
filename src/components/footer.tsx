@@ -1,5 +1,6 @@
 import Link from 'next/link';
-import { Diamond, Instagram, Twitter, Facebook } from 'lucide-react';
+import Image from 'next/image';
+import { Instagram, Twitter, Facebook } from 'lucide-react';
 
 export function Footer() {
   return (
@@ -8,8 +9,7 @@ export function Footer() {
         <div className="grid grid-cols-1 gap-8 md:grid-cols-3">
           <div className="md:col-span-1">
             <Link href="/" className="flex items-center space-x-2">
-              <Diamond className="h-8 w-8 text-primary" />
-              <span className="font-bold font-headline text-2xl">LORVÉ</span>
+              <Image src="https://res.cloudinary.com/dbwvn4eu9/image/upload/v1752210773/kk_logo_gekqhp.png" alt="LORVÉ logo" width={120} height={48} className="h-12 w-auto" />
             </Link>
             <p className="mt-4 text-sm">
               Crafting memories through the art of perfumery.

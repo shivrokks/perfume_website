@@ -2,7 +2,8 @@
 "use client";
 
 import Link from "next/link";
-import { Diamond, ShoppingBag, Menu } from "lucide-react";
+import Image from "next/image";
+import { ShoppingBag, Menu } from "lucide-react";
 import { Button, buttonVariants } from "./ui/button";
 import { ThemeToggle } from "./theme-toggle";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger, SheetFooter } from "./ui/sheet";
@@ -34,8 +35,7 @@ export function Header() {
         {/* DESKTOP: LOGO & NAV */}
         <div className="mr-auto hidden md:flex">
           <Link href="/" className="mr-6 flex items-center space-x-2">
-            <Diamond className="h-6 w-6 text-primary" />
-            <span className="font-bold font-headline text-lg">LORVÉ</span>
+            <Image src="https://res.cloudinary.com/dbwvn4eu9/image/upload/v1752210773/kk_logo_gekqhp.png" alt="LORVÉ logo" width={100} height={40} className="h-10 w-auto" />
           </Link>
           <nav className="flex items-center space-x-6 text-sm font-medium">
              {navLinks.map((link) => (
@@ -66,8 +66,7 @@ export function Header() {
                <SheetHeader className="p-6 pb-0">
                   <SheetTitle className="sr-only">Menu</SheetTitle>
                   <Link href="/" className="flex items-center space-x-2" onClick={() => setIsMobileMenuOpen(false)}>
-                    <Diamond className="h-6 w-6 text-primary" />
-                    <span className="font-bold font-headline text-lg">LORVÉ</span>
+                    <Image src="https://res.cloudinary.com/dbwvn4eu9/image/upload/v1752210773/kk_logo_gekqhp.png" alt="LORVÉ logo" width={100} height={40} className="h-10 w-auto" />
                   </Link>
               </SheetHeader>
               <nav className="mt-8 flex-1 px-6">
@@ -122,8 +121,7 @@ export function Header() {
 
           {/* Center: Logo */}
           <Link href="/" className="flex items-center space-x-2">
-            <Diamond className="h-6 w-6 text-primary" />
-            <span className="font-bold font-headline text-lg">LORVÉ</span>
+            <Image src="https://res.cloudinary.com/dbwvn4eu9/image/upload/v1752210773/kk_logo_gekqhp.png" alt="LORVÉ logo" width={100} height={40} className="h-10 w-auto" />
           </Link>
 
           {/* Right: Spacer to balance menu button */}
