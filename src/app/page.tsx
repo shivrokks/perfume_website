@@ -16,9 +16,12 @@ export default async function Home() {
         <div className="container mx-auto max-w-4xl text-center">
             {/* Hero Part */}
             <div>
-              <h1 className="font-headline text-5xl font-bold tracking-tighter md:text-7xl">
-                LORVÉ
-              </h1>
+              <div className="flex justify-center items-center gap-4">
+                <Image src="https://res.cloudinary.com/dbwvn4eu9/image/upload/v1752211770/kk_logo-removebg-preview_ysrakm.png" alt="LORVÉ logo" width={80} height={80} className="h-12 w-12 md:h-20 md:w-20" />
+                <h1 className="font-headline text-5xl font-bold tracking-tighter md:text-7xl">
+                  LORVÉ
+                </h1>
+              </div>
               <p className="mt-4 font-headline text-lg uppercase tracking-[0.3em] text-muted-foreground md:text-xl">
                 Reign with Aura
               </p>
