@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState } from 'react';
@@ -43,7 +44,8 @@ export default function LoginPage() {
     } catch (error: any) {
       console.error("Login error:", error);
       let description = "An unknown error occurred.";
-      if (error.code === 'auth/user-not-found' || error.code === 'auth/wrong-password' || error.code === 'auth/invalid-credential') {
+      // Handle modern Firebase auth errors
+      if (error.code === 'auth/invalid-credential') {
         description = "Invalid email or password. Please try again.";
       }
       toast({ variant: "destructive", title: "Login Failed", description });
