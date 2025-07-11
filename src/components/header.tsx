@@ -31,12 +31,12 @@ export function Header() {
   const pathname = usePathname();
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+    <header className="sticky top-0 z-50 w-full border-b bg-secondary">
       <div className="container flex h-16 items-center">
         {/* DESKTOP: LOGO & NAV */}
         <div className="mr-auto hidden md:flex">
           <Link href="/" className="mr-6 flex items-center space-x-2">
-            <Image src="https://res.cloudinary.com/dbwvn4eu9/image/upload/v1752210773/kk_logo_gekqhp.png" alt="LORVÉ logo" width={100} height={40} className="h-10 w-auto" />
+            <Image src="https://res.cloudinary.com/dbwvn4eu9/image/upload/v1752211770/kk_logo-removebg-preview_ysrakm.png" alt="LORVÉ logo" width={100} height={40} className="h-10 w-auto" />
           </Link>
           <nav className="flex items-center space-x-6 text-sm font-medium">
              {navLinks.map((link) => (
@@ -67,7 +67,7 @@ export function Header() {
                <SheetHeader className="p-6 pb-0">
                   <SheetTitle className="sr-only">Menu</SheetTitle>
                   <Link href="/" className="flex items-center space-x-2" onClick={() => setIsMobileMenuOpen(false)}>
-                    <Image src="https://res.cloudinary.com/dbwvn4eu9/image/upload/v1752210773/kk_logo_gekqhp.png" alt="LORVÉ logo" width={100} height={40} className="h-10 w-auto" />
+                    <Image src="https://res.cloudinary.com/dbwvn4eu9/image/upload/v1752211770/kk_logo-removebg-preview_ysrakm.png" alt="LORVÉ logo" width={100} height={40} className="h-10 w-auto" />
                   </Link>
               </SheetHeader>
               <nav className="mt-8 flex-1 px-6">
@@ -122,7 +122,7 @@ export function Header() {
 
           {/* Center: Logo */}
           <Link href="/" className="flex items-center space-x-2">
-            <Image src="https://res.cloudinary.com/dbwvn4eu9/image/upload/v1752210773/kk_logo_gekqhp.png" alt="LORVÉ logo" width={100} height={40} className="h-10 w-auto" />
+            <Image src="https://res.cloudinary.com/dbwvn4eu9/image/upload/v1752211770/kk_logo-removebg-preview_ysrakm.png" alt="LORVÉ logo" width={100} height={40} className="h-10 w-auto" />
           </Link>
 
           {/* Right: Spacer to balance menu button */}
