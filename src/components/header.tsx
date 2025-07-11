@@ -44,7 +44,7 @@ export function Header() {
                   key={link.href}
                   href={link.href}
                   className={cn(
-                    "transition-colors hover:text-foreground/80",
+                    "text-lg transition-colors hover:text-foreground/80",
                     pathname === link.href ? "text-foreground" : "text-foreground/60"
                   )}
                 >
@@ -130,11 +130,11 @@ export function Header() {
         </div>
 
         {/* DESKTOP: ACTIONS */}
-        <div className="hidden flex-1 items-center justify-end gap-2 md:flex">
+        <div className="hidden flex-1 items-center justify-end gap-4 md:flex">
           {loading ? null : user ? (
             <UserNav />
           ) : (
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-4">
                 <Link href="/login" className={cn(buttonVariants({ variant: "ghost", size: "lg" }))}>
                     Login
                 </Link>
