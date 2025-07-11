@@ -35,10 +35,10 @@ export function Header() {
       <div className="container flex h-16 items-center">
         {/* DESKTOP: LOGO & NAV */}
         <div className="mr-auto hidden md:flex">
-          <Link href="/" className="mr-6 flex items-center space-x-2">
+          <Link href="/" className="mr-8 flex items-center space-x-2">
             <Image src="https://res.cloudinary.com/dbwvn4eu9/image/upload/v1752211770/kk_logo-removebg-preview_ysrakm.png" alt="LORVÉ logo" width={100} height={40} className="h-10 w-auto" />
           </Link>
-          <nav className="flex items-center space-x-6 text-sm font-medium">
+          <nav className="flex items-center space-x-8 text-sm font-medium">
              {navLinks.map((link) => (
                 <Link
                   key={link.href}

@@ -1,3 +1,4 @@
+
 // @ts-nocheck
 "use client";
 
@@ -45,11 +46,14 @@ export function UserNav() {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="ghost" className="relative h-8 w-8 rounded-full">
-          <Avatar className="h-8 w-8">
+        <Button variant="ghost" className="relative h-10 gap-2 px-2">
+           <Avatar className="h-8 w-8">
             <AvatarImage src={user.photoURL || ""} alt={user.email || ""} />
             <AvatarFallback>{getInitials(user.email)}</AvatarFallback>
           </Avatar>
+          <span className="hidden text-sm font-medium text-foreground/80 transition-colors hover:text-foreground lg:block">
+            {user.email}
+          </span>
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent className="w-56" align="end" forceMount>
