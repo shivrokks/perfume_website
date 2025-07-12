@@ -3,11 +3,9 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 import { getProducts } from '@/lib/products';
-import PerfumeCard from '@/components/perfume-card';
+import DynamicProductShowcase from '@/components/dynamic-product-showcase';
 
 export default async function Home() {
-  const allProducts = await getProducts();
-  const featuredProducts = allProducts.slice(0, 4);
 
   return (
     <div className="flex flex-col">
@@ -50,30 +48,8 @@ export default async function Home() {
         </div>
       </section>
 
-      {/* Featured Products Section */}
-      <section className="bg-secondary py-16 sm:py-24">
-        <div className="container mx-auto">
-          <div className="mb-12 text-center">
-            <h2 className="font-headline text-3xl font-bold md:text-4xl">
-              Featured Products
-            </h2>
-            <p className="mt-2 text-lg text-muted-foreground">
-              Handpicked for an unforgettable experience.
-            </p>
-          </div>
-          {featuredProducts.length > 0 ? (
-            <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-4">
-              {featuredProducts.map((product) => (
-                <PerfumeCard key={product.id} perfume={product} />
-              ))}
-            </div>
-          ) : (
-            <p className="text-center text-muted-foreground">
-              Our collection will appear here soon.
-            </p>
-          )}
-        </div>
-      </section>
+      {/* Dynamic Products Section */}
+      <DynamicProductShowcase />
     </div>
   );
 }

@@ -4,9 +4,10 @@
 import { z } from "zod";
 import { firestore } from "@/lib/firebase";
 import cloudinary from "@/lib/cloudinary";
-import { collection, addDoc, serverTimestamp, doc, getDoc, setDoc, updateDoc, deleteDoc, arrayUnion, arrayRemove } from "firebase/firestore";
+import { collection, addDoc, serverTimestamp, doc, getDoc, setDoc, updateDoc, deleteDoc, arrayUnion, arrayRemove, getDocs, query, where, limit } from "firebase/firestore";
 import { revalidatePath } from "next/cache";
 import type { Address } from "@/lib/types";
+import { getProductsByCategory } from "@/lib/products";
 
 const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
 const ACCEPTED_IMAGE_TYPES = ["image/jpeg", "image/jpg", "image/png", "image/webp"];
@@ -263,4 +264,8 @@ export async function removeAdminEmail(email: string): Promise<{ success: boolea
   } catch (error: any) {
     return { success: false, error: "Failed to remove admin." };
   }
+}
+
+export async function getProductsForShowcase(category: string) {
+    return getProductsByCategory(category, 4);
 }

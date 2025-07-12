@@ -46,3 +46,20 @@ export const getProductById = async (id: string): Promise<Perfume | null> => {
     return null;
   }
 };
+
+export const getProductsByCategory = async (category: string, count: number = 4): Promise<Perfume[]> => {
+  try {
+    const productsCollection = collection(firestore, 'products');
+    const q = query(
+      productsCollection, 
+      where('category', '==', category),
+      orderBy('createdAt', 'desc'),
+      limit(count)
+    );
+    const productSnapshot = await getDocs(q);
+    return productSnapshot.docs.map(fromFirestore);
+  } catch (error) {
+    console.error(`Error fetching products for category ${category}:`, error);
+    return [];
+  }
+};
