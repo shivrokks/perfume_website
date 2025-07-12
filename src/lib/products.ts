@@ -53,7 +53,7 @@ export const getProductsByCategory = async (category: string, count: number = 4)
     const q = query(
       productsCollection, 
       where('category', '==', category),
-      orderBy('createdAt', 'desc'),
+      orderBy('name'), // Using a stable field for ordering
       limit(count)
     );
     const productSnapshot = await getDocs(q);
