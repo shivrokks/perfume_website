@@ -25,7 +25,7 @@ export default function AboutPage() {
             </div>
             <div className="relative h-96 w-full rounded-lg overflow-hidden shadow-xl">
                <Image
-                src="https://placehold.co/800x600.png"
+                src="https://res.cloudinary.com/dbwvn4eu9/image/upload/v1752211770/kk_logo-removebg-preview_ysrakm.png"
                 alt="Artisan perfumery workshop"
                 layout="fill"
                 objectFit="cover"
@@ -39,7 +39,7 @@ export default function AboutPage() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-16 items-center">
              <div className="relative h-96 w-full rounded-lg overflow-hidden shadow-xl md:order-2">
                <Image
-                src="https://placehold.co/800x600.png"
+                src="https://res.cloudinary.com/dbwvn4eu9/image/upload/v1752348500/hands_uadmyn.png"
                 alt="Rare botanical perfume ingredients"
                 layout="fill"
                 objectFit="cover"
