@@ -17,6 +17,8 @@ interface ProductDetailsProps {
 }
 
 const oilCategories = ['Essential Oil', 'Flavored Oils', 'Fragrance Oil', 'Arabic Attar'];
+const categoriesWithSize = ['Body Perfume', 'Floral Water', 'Arabic Attar'];
+
 
 export default function ProductDetails({ product }: ProductDetailsProps) {
   const { addToCart } = useCart();
@@ -24,6 +26,7 @@ export default function ProductDetails({ product }: ProductDetailsProps) {
   const [viewingHistory, setViewingHistory] = useState<string[]>([]);
 
   const isOil = oilCategories.includes(product.category);
+  const showSize = categoriesWithSize.includes(product.category);
   const oilTotalPrice = isOil ? (product.price / 100) * oilQuantity : 0;
 
   useEffect(() => {
@@ -61,7 +64,7 @@ export default function ProductDetails({ product }: ProductDetailsProps) {
           <p className="text-xl text-muted-foreground mt-2">{product.brand}</p>
           <div className="flex items-center gap-2 mt-4">
               <Badge variant="outline" className="text-base font-medium">{product.category}</Badge>
-              {!isOil && <Badge variant="secondary" className="text-base font-medium">{product.size}</Badge>}
+              {showSize && <Badge variant="secondary" className="text-base font-medium">{product.size}</Badge>}
           </div>
           
           {isOil ? (

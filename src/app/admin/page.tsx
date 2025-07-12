@@ -26,6 +26,7 @@ import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Loader2, Terminal, ShieldAlert } from 'lucide-react';
 
 const productCategories = ['Floral Water', 'Essential Oil', 'Flavored Oils', 'Body Perfume', 'Fragrance Oil', 'Arabic Attar'] as const;
+const categoriesWithSize = ['Body Perfume', 'Floral Water', 'Arabic Attar'];
 
 const ProductSchema = z.object({
   name: z.string().min(1, "Name is required"),
@@ -39,11 +40,11 @@ const ProductSchema = z.object({
   ingredients: z.string().min(1, "Provide comma-separated ingredients"),
   image: z.any().optional(),
 }).superRefine((data, ctx) => {
-  if (data.category === 'Body Perfume' && (!data.size || data.size.trim() === '')) {
+  if (categoriesWithSize.includes(data.category) && (!data.size || data.size.trim() === '')) {
     ctx.addIssue({
       code: z.ZodIssueCode.custom,
       path: ['size'],
-      message: 'Size is required for Body Perfumes (e.g., 50ml).',
+      message: 'Size is required for this product category (e.g., 50ml).',
     });
   }
 });
@@ -321,7 +322,7 @@ export default function AdminPage() {
                     </FormItem>
                   )}
                 />
-                 {category === 'Body Perfume' && (
+                 {categoriesWithSize.includes(category) && (
                    <FormField
                     control={form.control}
                     name="size"
@@ -454,6 +455,7 @@ export default function AdminPage() {
               <TableBody>
                 {products.map((product) => {
                   const isProductOil = ['Essential Oil', 'Flavored Oils', 'Fragrance Oil', 'Arabic Attar'].includes(product.category);
+                  const showSize = categoriesWithSize.includes(product.category);
                   return (
                     <TableRow key={product.id}>
                       <TableCell>
@@ -461,7 +463,7 @@ export default function AdminPage() {
                       </TableCell>
                       <TableCell className="font-medium">{product.name}</TableCell>
                       <TableCell>{product.category}</TableCell>
-                      <TableCell>{product.category === 'Body Perfume' ? product.size : '-'}</TableCell>
+                      <TableCell>{showSize ? product.size : '-'}</TableCell>
                       <TableCell>${product.price.toFixed(2)}{isProductOil ? '/100ml' : ''}</TableCell>
                       <TableCell>{product.gender}</TableCell>
                       <TableCell className="text-right space-x-2">

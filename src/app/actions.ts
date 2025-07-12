@@ -27,11 +27,11 @@ const ProductFormSchema = z.object({
     .refine(file => !file || file.size <= MAX_FILE_SIZE, 'Image must be less than 5MB')
     .refine(file => !file || ACCEPTED_IMAGE_TYPES.includes(file.type), 'Only .jpg, .jpeg, .png and .webp formats are supported.'),
 }).superRefine((data, ctx) => {
-  if (data.category === 'Body Perfume' && (!data.size || data.size.trim() === '')) {
+  if (['Body Perfume', 'Floral Water', 'Arabic Attar'].includes(data.category) && (!data.size || data.size.trim() === '')) {
     ctx.addIssue({
       code: z.ZodIssueCode.custom,
       path: ['size'],
-      message: 'Size is required for Body Perfumes (e.g., 50ml).',
+      message: 'Size is required for this product category (e.g., 50ml).',
     });
   }
 });
