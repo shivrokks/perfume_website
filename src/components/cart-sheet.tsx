@@ -11,6 +11,8 @@ import { SheetContent, SheetHeader, SheetTitle, SheetFooter, SheetClose } from "
 import { ShoppingBag, X } from "lucide-react";
 import { Input } from "./ui/input";
 
+const oilCategories = ['Essential Oil', 'Flavored Oils', 'Fragrance Oil', 'Arabic Attar'];
+
 export function CartSheet() {
   const { cartItems, removeFromCart, updateQuantity, totalPrice } = useCart();
   const router = useRouter();
@@ -29,7 +31,7 @@ export function CartSheet() {
         <div className="flex-1 overflow-y-auto px-6">
           <div className="flex flex-col gap-4">
             {cartItems.map((item) => {
-              const isOil = item.category === 'Oils';
+              const isOil = oilCategories.includes(item.category);
               const itemTotal = isOil ? (item.price / 100) * item.quantity : item.price * item.quantity;
               
               return (

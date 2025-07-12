@@ -22,10 +22,12 @@ const cardVariants = {
   }
 };
 
+const oilCategories = ['Essential Oil', 'Flavored Oils', 'Fragrance Oil', 'Arabic Attar'];
+
 export default function PerfumeCard({ perfume }: PerfumeCardProps) {
   const { cartItems, addToCart, updateQuantity } = useCart();
   const itemInCart = cartItems.find((item) => item.id === perfume.id);
-  const isOil = perfume.category === 'Oils';
+  const isOil = oilCategories.includes(perfume.category);
 
   return (
     <motion.div variants={cardVariants} className="h-full">

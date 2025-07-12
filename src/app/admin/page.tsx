@@ -25,23 +25,25 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Loader2, Terminal, ShieldAlert } from 'lucide-react';
 
+const productCategories = ['Floral Water', 'Essential Oil', 'Flavored Oils', 'Body Perfume', 'Fragrance Oil', 'Arabic Attar'] as const;
+
 const ProductSchema = z.object({
   name: z.string().min(1, "Name is required"),
   brand: z.string().min(1, "Brand is required"),
   price: z.coerce.number().min(0, "Price must be a positive number"),
   gender: z.enum(["Men", "Women", "Unisex"]),
-  category: z.enum(['Perfume', 'Oils']),
+  category: z.enum(productCategories),
   size: z.string().optional(),
   notes: z.string().min(1, "Provide comma-separated notes"),
   description: z.string().min(1, "Description is required"),
   ingredients: z.string().min(1, "Provide comma-separated ingredients"),
   image: z.any().optional(),
 }).superRefine((data, ctx) => {
-  if (data.category === 'Perfume' && (!data.size || data.size.trim() === '')) {
+  if (data.category === 'Body Perfume' && (!data.size || data.size.trim() === '')) {
     ctx.addIssue({
       code: z.ZodIssueCode.custom,
       path: ['size'],
-      message: 'Size is required for perfumes (e.g., 50ml).',
+      message: 'Size is required for Body Perfumes (e.g., 50ml).',
     });
   }
 });
@@ -51,7 +53,7 @@ const defaultFormValues = {
   brand: 'LORVÉ',
   price: 100,
   gender: 'Unisex' as const,
-  category: 'Perfume' as const,
+  category: 'Body Perfume' as const,
   size: '50ml',
   notes: '',
   description: '',
@@ -77,6 +79,7 @@ export default function AdminPage() {
   });
   
   const category = form.watch('category');
+  const isOilTypeCategory = ['Essential Oil', 'Flavored Oils', 'Fragrance Oil', 'Arabic Attar'].includes(category);
 
   const { isSubmitting } = useFormState({ control: form.control });
 
@@ -109,7 +112,7 @@ export default function AdminPage() {
     setFormError(null);
     form.reset({
       ...product,
-      category: product.category || 'Perfume',
+      category: product.category || 'Body Perfume',
       notes: product.notes.join(', '),
       ingredients: product.ingredients.join(', '),
       image: undefined, // Reset image field
@@ -273,8 +276,7 @@ export default function AdminPage() {
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
-                          <SelectItem value="Perfume">Perfume</SelectItem>
-                          <SelectItem value="Oils">Oils</SelectItem>
+                          {productCategories.map(cat => <SelectItem key={cat} value={cat}>{cat}</SelectItem>)}
                         </SelectContent>
                       </Select>
                       <FormMessage />
@@ -286,7 +288,7 @@ export default function AdminPage() {
                   name="price"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>{category === 'Oils' ? 'Price per 100ml' : 'Price'}</FormLabel>
+                      <FormLabel>{isOilTypeCategory ? 'Price per 100ml' : 'Price'}</FormLabel>
                       <FormControl>
                         <Input type="number" placeholder="180" {...field} />
                       </FormControl>
@@ -319,7 +321,7 @@ export default function AdminPage() {
                     </FormItem>
                   )}
                 />
-                 {category === 'Perfume' && (
+                 {category === 'Body Perfume' && (
                    <FormField
                     control={form.control}
                     name="size"
@@ -450,26 +452,29 @@ export default function AdminPage() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {products.map((product) => (
-                  <TableRow key={product.id}>
-                    <TableCell>
-                      <Image src={product.image} alt={product.name} width={48} height={48} className="rounded-md border object-cover" />
-                    </TableCell>
-                    <TableCell className="font-medium">{product.name}</TableCell>
-                    <TableCell>{product.category}</TableCell>
-                    <TableCell>{product.category === 'Oils' ? '-' : product.size}</TableCell>
-                    <TableCell>${product.price.toFixed(2)}{product.category === 'Oils' ? '/100ml' : ''}</TableCell>
-                    <TableCell>{product.gender}</TableCell>
-                    <TableCell className="text-right space-x-2">
-                      <Button variant="outline" size="sm" onClick={() => handleEditClick(product)}>
-                        Edit
-                      </Button>
-                      <Button variant="destructive" size="sm" onClick={() => setProductToDelete(product)}>
-                        Delete
-                      </Button>
-                    </TableCell>
-                  </TableRow>
-                ))}
+                {products.map((product) => {
+                  const isProductOil = ['Essential Oil', 'Flavored Oils', 'Fragrance Oil', 'Arabic Attar'].includes(product.category);
+                  return (
+                    <TableRow key={product.id}>
+                      <TableCell>
+                        <Image src={product.image} alt={product.name} width={48} height={48} className="rounded-md border object-cover" />
+                      </TableCell>
+                      <TableCell className="font-medium">{product.name}</TableCell>
+                      <TableCell>{product.category}</TableCell>
+                      <TableCell>{product.category === 'Body Perfume' ? product.size : '-'}</TableCell>
+                      <TableCell>${product.price.toFixed(2)}{isProductOil ? '/100ml' : ''}</TableCell>
+                      <TableCell>{product.gender}</TableCell>
+                      <TableCell className="text-right space-x-2">
+                        <Button variant="outline" size="sm" onClick={() => handleEditClick(product)}>
+                          Edit
+                        </Button>
+                        <Button variant="destructive" size="sm" onClick={() => setProductToDelete(product)}>
+                          Delete
+                        </Button>
+                      </TableCell>
+                    </TableRow>
+                  );
+                })}
               </TableBody>
             </Table>
           )}

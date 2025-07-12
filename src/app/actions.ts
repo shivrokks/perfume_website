@@ -16,7 +16,7 @@ const ProductFormSchema = z.object({
   brand: z.string().min(1, "Brand is required"),
   price: z.coerce.number().min(0, "Price must be a positive number"),
   gender: z.enum(["Men", "Women", "Unisex"]),
-  category: z.enum(['Perfume', 'Oils']),
+  category: z.enum(['Floral Water', 'Essential Oil', 'Flavored Oils', 'Body Perfume', 'Fragrance Oil', 'Arabic Attar']),
   size: z.string().optional(),
   notes: z.string().min(1, "Notes are required"),
   description: z.string().min(1, "Description is required"),
@@ -27,11 +27,11 @@ const ProductFormSchema = z.object({
     .refine(file => !file || file.size <= MAX_FILE_SIZE, 'Image must be less than 5MB')
     .refine(file => !file || ACCEPTED_IMAGE_TYPES.includes(file.type), 'Only .jpg, .jpeg, .png and .webp formats are supported.'),
 }).superRefine((data, ctx) => {
-  if (data.category === 'Perfume' && (!data.size || data.size.trim() === '')) {
+  if (data.category === 'Body Perfume' && (!data.size || data.size.trim() === '')) {
     ctx.addIssue({
       code: z.ZodIssueCode.custom,
       path: ['size'],
-      message: 'Size is required for perfumes (e.g., 50ml).',
+      message: 'Size is required for Body Perfumes (e.g., 50ml).',
     });
   }
 });

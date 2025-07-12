@@ -17,6 +17,8 @@ interface CartContextType {
 
 export const CartContext = createContext<CartContextType | undefined>(undefined);
 
+const oilCategories = ['Essential Oil', 'Flavored Oils', 'Fragrance Oil', 'Arabic Attar'];
+
 export const CartProvider = ({ children }: { children: ReactNode }) => {
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
   const { toast } = useToast();
@@ -69,7 +71,7 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
   const cartCount = cartItems.length; // Now represents number of unique items
 
   const totalPrice = cartItems.reduce((acc, item) => {
-    if (item.category === 'Oils') {
+    if (oilCategories.includes(item.category)) {
       return acc + (item.price / 100) * item.quantity;
     }
     return acc + item.price * item.quantity;

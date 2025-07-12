@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState, useMemo } from 'react';
@@ -45,17 +46,9 @@ export default function ProductGrid({ allProducts }: ProductGridProps) {
   const filteredAndSortedProducts = useMemo(() => {
     let products = [...allProducts];
 
-    // Filter by category - Fixed logic
+    // Filter by category
     if (categoryFilter !== 'All') {
-      if (categoryFilter === 'Oils') {
-        products = products.filter(p => p.category === 'Oils');
-      } else if (categoryFilter === 'Perfume') {
-        // Include products that are explicitly "Perfume" category or have no category specified
-        products = products.filter(p => p.category === 'Perfume' || p.category === '' || p.category === undefined);
-      } else {
-        // For any other specific category
-        products = products.filter(p => p.category === categoryFilter);
-      }
+      products = products.filter(p => p.category === categoryFilter);
     }
 
     // Filter by gender
@@ -63,7 +56,7 @@ export default function ProductGrid({ allProducts }: ProductGridProps) {
       products = products.filter(p => p.gender === genderFilter);
     }
 
-    // Filter by price - Fixed to use selectedPriceRange
+    // Filter by price
     products = products.filter(p => p.price >= selectedPriceRange[0] && p.price <= selectedPriceRange[1]);
     
     // Sort products
@@ -92,13 +85,13 @@ export default function ProductGrid({ allProducts }: ProductGridProps) {
   // Get unique categories from products
   const availableCategories = useMemo(() => {
     const categories = new Set(allProducts.map(p => p.category).filter(Boolean));
-    return ['All', ...Array.from(categories)];
+    return ['All', ...Array.from(categories).sort()];
   }, [allProducts]);
 
   // Get unique genders from products
   const availableGenders = useMemo(() => {
     const genders = new Set(allProducts.map(p => p.gender).filter(Boolean));
-    return ['All', ...Array.from(genders)];
+    return ['All', 'Men', 'Women', 'Unisex'];
   }, [allProducts]);
   
   const containerVariants = {

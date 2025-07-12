@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useEffect, useState } from 'react';
@@ -15,12 +16,14 @@ interface ProductDetailsProps {
   product: Perfume;
 }
 
+const oilCategories = ['Essential Oil', 'Flavored Oils', 'Fragrance Oil', 'Arabic Attar'];
+
 export default function ProductDetails({ product }: ProductDetailsProps) {
   const { addToCart } = useCart();
   const [oilQuantity, setOilQuantity] = useState(100);
   const [viewingHistory, setViewingHistory] = useState<string[]>([]);
 
-  const isOil = product.category === 'Oils';
+  const isOil = oilCategories.includes(product.category);
   const oilTotalPrice = isOil ? (product.price / 100) * oilQuantity : 0;
 
   useEffect(() => {

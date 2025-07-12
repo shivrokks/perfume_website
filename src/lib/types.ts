@@ -1,3 +1,6 @@
+
+export type ProductCategory = 'Floral Water' | 'Essential Oil' | 'Flavored Oils' | 'Body Perfume' | 'Fragrance Oil' | 'Arabic Attar';
+
 export interface Perfume {
   id: string;
   name: string;
@@ -8,7 +11,7 @@ export interface Perfume {
   notes: string[];
   description: string;
   ingredients: string[];
-  category?: 'Perfume' | 'Oils';
+  category: ProductCategory;
   size: string;
 }
 
