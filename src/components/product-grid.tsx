@@ -265,7 +265,7 @@ export default function ProductGrid({ allProducts }: ProductGridProps) {
         {filteredAndSortedProducts.length > 0 ? (
           <motion.div 
             key={`${genderFilter}-${categoryFilter}-${selectedPriceRange.join('-')}-${sortOrder}`}
-            className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6"
+            className="grid grid-cols-2 sm:grid-cols-2 xl:grid-cols-4 gap-4"
             variants={containerVariants}
             initial="hidden"
             animate="visible"
