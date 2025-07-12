@@ -23,7 +23,8 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import { Loader2, Terminal, ShieldAlert } from 'lucide-react';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
+import { ChevronRight, Loader2, Terminal, ShieldAlert } from 'lucide-react';
 
 const productCategories = ['Floral Water', 'Essential Oil', 'Flavored Oils', 'Body Perfume', 'Fragrance Oil', 'Arabic Attar'] as const;
 const categoriesWithSize = ['Body Perfume', 'Floral Water', 'Arabic Attar'];
@@ -204,6 +205,17 @@ export default function AdminPage() {
         });
     }
   }
+
+  const groupedProducts = products.reduce((acc, product) => {
+    const category = product.category || 'Uncategorized';
+    if (!acc[category]) {
+      acc[category] = [];
+    }
+    acc[category].push(product);
+    return acc;
+  }, {} as Record<string, Perfume[]>);
+
+  const sortedCategories = Object.keys(groupedProducts).sort();
 
   if (loading) {
     return (
@@ -440,45 +452,57 @@ export default function AdminPage() {
               <Loader2 className="h-8 w-8 animate-spin" />
             </div>
           ) : (
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead className="w-[80px]">Image</TableHead>
-                  <TableHead>Name</TableHead>
-                  <TableHead>Category</TableHead>
-                  <TableHead>Size</TableHead>
-                  <TableHead>Price</TableHead>
-                  <TableHead>Gender</TableHead>
-                  <TableHead className="text-right">Actions</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {products.map((product) => {
-                  const isProductOil = ['Essential Oil', 'Flavored Oils', 'Fragrance Oil', 'Arabic Attar'].includes(product.category);
-                  const showSize = categoriesWithSize.includes(product.category);
-                  return (
-                    <TableRow key={product.id}>
-                      <TableCell>
-                        <Image src={product.image} alt={product.name} width={48} height={48} className="rounded-md border object-cover" />
-                      </TableCell>
-                      <TableCell className="font-medium">{product.name}</TableCell>
-                      <TableCell>{product.category}</TableCell>
-                      <TableCell>{showSize ? product.size : '-'}</TableCell>
-                      <TableCell>${product.price.toFixed(2)}{isProductOil ? '/100ml' : ''}</TableCell>
-                      <TableCell>{product.gender}</TableCell>
-                      <TableCell className="text-right space-x-2">
-                        <Button variant="outline" size="sm" onClick={() => handleEditClick(product)}>
-                          Edit
-                        </Button>
-                        <Button variant="destructive" size="sm" onClick={() => setProductToDelete(product)}>
-                          Delete
-                        </Button>
-                      </TableCell>
-                    </TableRow>
-                  );
-                })}
-              </TableBody>
-            </Table>
+            <div className="space-y-4">
+              {sortedCategories.map(category => (
+                <Collapsible key={category} defaultOpen={true} className="border-b">
+                  <CollapsibleTrigger className="flex w-full justify-between items-center py-4 font-headline text-xl">
+                    <span>{category} ({groupedProducts[category].length})</span>
+                    <ChevronRight className="h-5 w-5 transition-transform duration-300 [&[data-state=open]]:rotate-90" />
+                  </CollapsibleTrigger>
+                  <CollapsibleContent>
+                    <div className="pb-4">
+                        <Table>
+                          <TableHeader>
+                            <TableRow>
+                              <TableHead className="w-[80px]">Image</TableHead>
+                              <TableHead>Name</TableHead>
+                              <TableHead>Size</TableHead>
+                              <TableHead>Price</TableHead>
+                              <TableHead>Gender</TableHead>
+                              <TableHead className="text-right">Actions</TableHead>
+                            </TableRow>
+                          </TableHeader>
+                          <TableBody>
+                            {groupedProducts[category].map((product) => {
+                              const isProductOil = ['Essential Oil', 'Flavored Oils', 'Fragrance Oil', 'Arabic Attar'].includes(product.category);
+                              const showSize = categoriesWithSize.includes(product.category);
+                              return (
+                                <TableRow key={product.id}>
+                                  <TableCell>
+                                    <Image src={product.image} alt={product.name} width={48} height={48} className="rounded-md border object-cover" />
+                                  </TableCell>
+                                  <TableCell className="font-medium">{product.name}</TableCell>
+                                  <TableCell>{showSize ? product.size : '-'}</TableCell>
+                                  <TableCell>${product.price.toFixed(2)}{isProductOil ? '/100ml' : ''}</TableCell>
+                                  <TableCell>{product.gender}</TableCell>
+                                  <TableCell className="text-right space-x-2">
+                                    <Button variant="outline" size="sm" onClick={() => handleEditClick(product)}>
+                                      Edit
+                                    </Button>
+                                    <Button variant="destructive" size="sm" onClick={() => setProductToDelete(product)}>
+                                      Delete
+                                    </Button>
+                                  </TableCell>
+                                </TableRow>
+                              );
+                            })}
+                          </TableBody>
+                        </Table>
+                    </div>
+                  </CollapsibleContent>
+                </Collapsible>
+              ))}
+            </div>
           )}
         </CardContent>
       </Card>
